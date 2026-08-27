@@ -19,14 +19,24 @@ function withoutSecrets(user) {
   return safeUser;
 }
 
-async function initDatabase() {
+async function initDatabase(retries = 5, delay = 3000) {
   if (!mongoUri) {
     throw new Error('MONGODB_URI is required. Add it to your environment before starting the server.');
   }
 
-  client = new MongoClient(mongoUri, { tls: true });
-  await client.connect();
-  database = client.db(databaseName);
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      client = new MongoClient(mongoUri, { tls: true, serverSelectionTimeoutMS: 10000, retryWrites: true });
+      await client.connect();
+      database = client.db(databaseName);
+      console.log(`✅ Successfully connected to MongoDB database: ${databaseName} (Attempt ${attempt})`);
+      break;
+    } catch (err) {
+      console.error(`⚠️ MongoDB connection attempt ${attempt}/${retries} failed: ${err.message}`);
+      if (attempt === retries) throw err;
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
 
   await Promise.all([
     collection('users').createIndex({ username: 1 }, { unique: true }),
