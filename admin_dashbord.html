@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gram Sahayak Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800&amp;family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface": "#f9f9f9",
+                      "primary-container": "#2e7d32",
+                      "secondary-fixed": "#ffdcc6",
+                      "surface-container-lowest": "#ffffff",
+                      "primary-fixed": "#a3f69c",
+                      "surface-container": "#eeeeee",
+                      "surface-variant": "#e2e2e2",
+                      "inverse-surface": "#2f3131",
+                      "on-primary-fixed-variant": "#005312",
+                      "inverse-on-surface": "#f0f1f1",
+                      "on-secondary": "#ffffff",
+                      "surface-container-low": "#f3f3f3",
+                      "on-secondary-fixed-variant": "#723600",
+                      "on-error-container": "#93000a",
+                      "outline-variant": "#bfcaba",
+                      "on-tertiary-container": "#ebf1ff",
+                      "on-surface-variant": "#40493d",
+                      "inverse-primary": "#88d982",
+                      "surface-container-highest": "#e2e2e2",
+                      "error": "#ba1a1a",
+                      "secondary": "#964900",
+                      "primary-fixed-dim": "#88d982",
+                      "secondary-container": "#fc820c",
+                      "surface-container-high": "#e8e8e8",
+                      "surface-bright": "#f9f9f9",
+                      "on-primary": "#ffffff",
+                      "outline": "#707a6c",
+                      "error-container": "#ffdad6",
+                      "on-tertiary-fixed": "#001c3a",
+                      "background": "#f9f9f9",
+                      "tertiary-fixed": "#d4e3ff",
+                      "on-tertiary": "#ffffff",
+                      "on-background": "#1a1c1c",
+                      "on-primary-fixed": "#002204",
+                      "secondary-fixed-dim": "#ffb786",
+                      "tertiary-fixed-dim": "#a5c8ff",
+                      "on-primary-container": "#cbffc2",
+                      "on-secondary-container": "#5e2c00",
+                      "primary": "#0d631b",
+                      "on-error": "#ffffff",
+                      "tertiary-container": "#006eca",
+                      "surface-tint": "#1b6d24",
+                      "on-tertiary-fixed-variant": "#004786",
+                      "tertiary": "#00569f",
+                      "surface-dim": "#dadada",
+                      "on-secondary-fixed": "#311300",
+                      "on-surface": "#1a1c1c"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "gutter": "16px",
+                      "margin-desktop": "32px",
+                      "container-max": "800px",
+                      "base": "8px"
+              },
+              "fontFamily": {
+                      "headline-lg": [
+                              "Atkinson Hyperlegible Next"
+                      ],
+                      "label-lg": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Atkinson Hyperlegible Next"
+                      ],
+                      "headline-lg-mobile": [
+                              "Atkinson Hyperlegible Next"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-lg": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.1px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "26px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+            },
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-surface dark:bg-inverse-surface bg-surface-container dark:bg-surface-container-high shadow-sm z-20 p-4 gap-2">
+<div class="mb-8 px-4 flex flex-col">
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary">Admin Portal</h1>
+<span class="font-label-md text-label-md text-on-surface-variant">Rural Assistance</span>
+</div>
+<ul class="flex flex-col gap-2 flex-grow">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg active:scale-95 duration-150 ease-in-out font-label-lg text-label-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Overview</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-variant transition-colors active:scale-95 duration-150 ease-in-out font-label-lg text-label-lg rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="assessment">assessment</span>
+<span>Reports</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-variant transition-colors active:scale-95 duration-150 ease-in-out font-label-lg text-label-lg rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="pending_actions">pending_actions</span>
+<span>Pending Work</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-variant transition-colors active:scale-95 duration-150 ease-in-out font-label-lg text-label-lg rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span>Citizen Database</span>
+</a>
+</li>
+<li class="mt-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-highest dark:hover:bg-surface-variant transition-colors active:scale-95 duration-150 ease-in-out font-label-lg text-label-lg rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</li>
+</ul>
+<div class="mt-4 pt-4 border-t border-outline-variant flex items-center gap-3 px-4">
+<div class="w-10 h-10 rounded-full bg-primary-container overflow-hidden flex-shrink-0">
+<img alt="Official's Profile" class="w-full h-full object-cover" data-alt="A professional portrait of a rural government official, approachable yet authoritative, dressed in standard Indian civil service attire, well-lit in an office setting. The mood is trustworthy and official." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCliixyX4hD2b2cEtxiMSwMzq-R9rDIe9l4QNM1Ggzztb1tB1lmk6S9n-boJtNuk2tuNb5Gl6AN7RhvyICySFioltSSJv36Yd3VKgi8Ag5il9nT9XutTy3dzXZL6HtJkQQmI4wR0-EE_ozJEPvsaqK09RVlcLpRo3moyLpms6WTy0jHnyPEAfSf6r7-H66VYxqmp4Y-wd-8RCV0xD6FJylY_PcYYc1VZxlMDbZgRBm_ANEelYUkG_fJ9Q"/>
+</div>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">Official Profile</span>
+<span class="font-label-md text-label-md text-on-surface-variant">View details</span>
+</div>
+</div>
+</nav>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 w-full md:w-[calc(100%-16rem)] h-16 bg-surface-container-lowest dark:bg-inverse-surface flex justify-between items-center px-6 border-b border-outline-variant z-10 hidden md:flex ml-64">
+<div class="flex items-center gap-4">
+<h2 class="font-headline-md text-headline-md font-extrabold text-primary dark:text-inverse-primary hidden lg:block">Gram Swaraj Admin</h2>
+</div>
+<div class="flex-grow max-w-md mx-8 flex justify-end">
+<div class="relative w-full max-w-sm">
+<input class="w-full h-10 pl-4 pr-10 rounded-full bg-surface-container-low border border-outline-variant focus:outline-none focus:ring-2 focus:ring-secondary-container focus:border-transparent font-body-md text-body-md" placeholder="Search..." type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-2 text-on-surface-variant">search</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex flex-col items-end hidden sm:flex">
+<span class="font-label-md text-label-md text-primary font-bold">Village: Kalyanpur</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Officer Ramesh Kumar</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-all cursor-pointer">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-all cursor-pointer">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden md:hidden">
+<img alt="Officer Avatar" class="w-full h-full object-cover" data-alt="A professional portrait of a rural government official, approachable yet authoritative, dressed in standard Indian civil service attire, well-lit in an office setting. The mood is trustworthy and official." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFcNqd3HLZVReXJ86CkhG8oB4QHLciIOVuFEsobEuncgdHK-Obs5grF4y-mIs6eS-oCHluq2hHR0iO_bhOjBavkVIRhnERQrzii92aRhqYBmA8GtplHvWhN8R9wEGMOvKzAqShAxnDD-oZNG_kpx7khMTtXWw31hOsf97Md5IDJ8_e6gMYmT8nQl8OYDmrWRNuckNUDIMPezm08wIBP15OOL3l_zr36OXOVYBpSxFMlEp6zqvSgX2RNw"/>
+</div>
+</div>
+</header>
+<!-- Mobile Header -->
+<header class="md:hidden flex items-center justify-between p-4 bg-surface-container-lowest border-b border-outline-variant fixed top-0 w-full z-10">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Admin Portal</h1>
+<div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden">
+<img alt="Officer Avatar" class="w-full h-full object-cover" data-alt="A professional portrait of a rural government official, approachable yet authoritative, dressed in standard Indian civil service attire, well-lit in an office setting. The mood is trustworthy and official." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzGM4PjLPqoa-HTbbdXMjfBnDs43B6xxzb4JeaR1mRun9aVoJN3YsLycoHeXoyZKYqVob669BfUH6dknbpeeCKTYywxxn80OShgDY8woM1fUoQrAL8q13mpppAVQrZQIhWhD9wUlzH8pSlyvCxza3Tn-Pb3V66I9IA22dewmY6e99vS7YnVoYhv_QYinv9ZOdU3mvhCc_ln9LpVvuQifIz6K6m0-y4BVWA3pFNQUfOHddYRgDQEu8MsA"/>
+</div>
+</header>
+<!-- Main Content -->
+<main class="pt-[72px] md:pt-24 pb-20 md:pb-8 md:pl-[17rem] pr-4 md:pr-8 mx-auto w-full">
+<div class="mb-8">
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2">Dashboard Overview</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">High-level summary for Kalyanpur Village</p>
+</div>
+<!-- Bento Grid Stats -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+<!-- Stat 1 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-outline-variant relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-error-container rounded-full opacity-20 group-hover:scale-150 transition-transform duration-500"></div>
+<div class="flex justify-between items-start relative z-10">
+<div>
+<p class="font-label-lg text-label-lg text-on-surface-variant mb-1">Active Reports</p>
+<h3 class="font-headline-lg text-headline-lg text-error font-bold">24</h3>
+</div>
+<div class="w-12 h-12 rounded-full bg-error-container flex items-center justify-center text-error">
+<span class="material-symbols-outlined filled">report_problem</span>
+</div>
+</div>
+<div class="mt-4 flex items-center gap-2 text-sm text-on-surface-variant relative z-10">
+<span class="material-symbols-outlined text-error text-[16px]">trending_up</span>
+<span>+3 from last week</span>
+</div>
+</div>
+<!-- Stat 2 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-outline-variant relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-primary-container rounded-full opacity-20 group-hover:scale-150 transition-transform duration-500"></div>
+<div class="flex justify-between items-start relative z-10">
+<div>
+<p class="font-label-lg text-label-lg text-on-surface-variant mb-1">Resolved This Month</p>
+<h3 class="font-headline-lg text-headline-lg text-primary font-bold">112</h3>
+</div>
+<div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined filled">check_circle</span>
+</div>
+</div>
+<div class="mt-4 flex items-center gap-2 text-sm text-on-surface-variant relative z-10">
+<span class="material-symbols-outlined text-primary text-[16px]">trending_up</span>
+<span>+15% efficiency</span>
+</div>
+</div>
+<!-- Stat 3 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border border-outline-variant relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-tertiary-container rounded-full opacity-20 group-hover:scale-150 transition-transform duration-500"></div>
+<div class="flex justify-between items-start relative z-10">
+<div>
+<p class="font-label-lg text-label-lg text-on-surface-variant mb-1">Avg Response Time</p>
+<h3 class="font-headline-lg text-headline-lg text-tertiary font-bold">2.5<span class="text-lg font-normal text-on-surface-variant ml-1">days</span></h3>
+</div>
+<div class="w-12 h-12 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary-container">
+<span class="material-symbols-outlined filled">timer</span>
+</div>
+</div>
+<div class="mt-4 flex items-center gap-2 text-sm text-on-surface-variant relative z-10">
+<span class="material-symbols-outlined text-tertiary text-[16px]">trending_down</span>
+<span>0.5 days faster</span>
+</div>
+</div>
+</div>
+<!-- Recent Reports Table Section -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant overflow-hidden">
+<div class="p-6 border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Recent Reports</h3>
+<button class="font-label-lg text-label-lg text-primary hover:text-primary-container transition-colors flex items-center gap-1">
+                    View All
+                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="p-4 font-label-lg text-label-lg text-on-surface-variant font-semibold">Report ID</th>
+<th class="p-4 font-label-lg text-label-lg text-on-surface-variant font-semibold">Category</th>
+<th class="p-4 font-label-lg text-label-lg text-on-surface-variant font-semibold">Location</th>
+<th class="p-4 font-label-lg text-label-lg text-on-surface-variant font-semibold">Date</th>
+<th class="p-4 font-label-lg text-label-lg text-on-surface-variant font-semibold">Status</th>
+<th class="p-4 font-label-lg text-label-lg text-on-surface-variant font-semibold text-right">Action</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md text-on-surface">
+<tr class="border-b border-outline-variant hover:bg-surface-container-lowest transition-colors">
+<td class="p-4 font-medium">#REP-089</td>
+<td class="p-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary">water_drop</span>
+                                Water Supply
+                            </td>
+<td class="p-4">Ward 4, Near Panchayat Bhawan</td>
+<td class="p-4 text-on-surface-variant">Oct 12, 2023</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-error-container text-on-error-container">
+                                    Pending
+                                </span>
+</td>
+<td class="p-4 text-right">
+<button class="text-primary hover:bg-primary-container hover:text-on-primary-container p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container-lowest transition-colors">
+<td class="p-4 font-medium">#REP-088</td>
+<td class="p-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary-container">bolt</span>
+                                Electricity
+                            </td>
+<td class="p-4">Main Road, Sector 2</td>
+<td class="p-4 text-on-surface-variant">Oct 11, 2023</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface-container-high text-on-surface-variant">
+                                    In Progress
+                                </span>
+</td>
+<td class="p-4 text-right">
+<button class="text-primary hover:bg-primary-container hover:text-on-primary-container p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container-lowest transition-colors">
+<td class="p-4 font-medium">#REP-087</td>
+<td class="p-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-outline">agriculture</span>
+                                Agriculture
+                            </td>
+<td class="p-4">North Farms</td>
+<td class="p-4 text-on-surface-variant">Oct 10, 2023</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-container text-on-primary-container">
+                                    Resolved
+                                </span>
+</td>
+<td class="p-4 text-right">
+<button class="text-primary hover:bg-primary-container hover:text-on-primary-container p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="p-4 font-medium">#REP-086</td>
+<td class="p-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">add_road</span>
+                                Infrastructure
+                            </td>
+<td class="p-4">Village Square</td>
+<td class="p-4 text-on-surface-variant">Oct 09, 2023</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-error-container text-on-error-container">
+                                    Pending
+                                </span>
+</td>
+<td class="p-4 text-right">
+<button class="text-primary hover:bg-primary-container hover:text-on-primary-container p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</main>
+<!-- Mobile Bottom Navigation (Visible only on small screens) -->
+<nav class="md:hidden fixed bottom-0 w-full bg-surface-container-lowest border-t border-outline-variant flex justify-around p-2 z-10 pb-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+<a class="flex flex-col items-center p-2 text-primary" href="#">
+<div class="w-16 h-8 rounded-full bg-primary-container flex items-center justify-center mb-1">
+<span class="material-symbols-outlined filled text-on-primary-container">dashboard</span>
+</div>
+<span class="font-label-md text-[10px] font-semibold">Overview</span>
+</a>
+<a class="flex flex-col items-center p-2 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined mb-1">assessment</span>
+<span class="font-label-md text-[10px]">Reports</span>
+</a>
+<a class="flex flex-col items-center p-2 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined mb-1">pending_actions</span>
+<span class="font-label-md text-[10px]">Pending</span>
+</a>
+<a class="flex flex-col items-center p-2 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined mb-1">settings</span>
+<span class="font-label-md text-[10px]">Settings</span>
+</a>
+</nav>
+</body></html>

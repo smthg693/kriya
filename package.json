@@ -1,0 +1,31 @@
+{
+  "name": "gram-sahayak",
+  "version": "1.0.0",
+  "description": "Gram Sahayak - Real-Time Rural Assistance & Gram Swaraj Portal",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "migrate:mongodb": "node migrate-to-mongodb.js"
+  },
+  "keywords": [
+    "rural-assistance",
+    "gram-panchayat",
+    "e-governance",
+    "realtime",
+    "mongodb",
+    "migration"
+  ],
+  "author": "Gram Sahayak Team",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.19.2",
+    "mongodb": "^7.6.0",
+    "multer": "^1.4.5-lts.1",
+    "socket.io": "^4.7.5",
+    "sqlite3": "^5.1.7"
+  }
+}

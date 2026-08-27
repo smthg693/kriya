@@ -1,0 +1,129 @@
+/* Gram Sahayak Master Design Stylesheet */
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary: #0d631b;
+  --primary-container: #2e7d32;
+  --on-primary: #ffffff;
+  --secondary: #964900;
+  --secondary-container: #fc820c;
+  --tertiary: #00569f;
+  --tertiary-container: #006eca;
+  --background: #f9f9f9;
+  --surface: #ffffff;
+  --surface-container: #eeeeee;
+  --surface-container-low: #f3f3f3;
+  --text-on-surface: #1a1c1c;
+  --text-muted: #555555;
+  --border-color: #bfcaba;
+  --error: #ba1a1a;
+  --error-container: #ffdad6;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--background);
+  color: var(--text-on-surface);
+  background-image: radial-gradient(#e2e2e2 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+h1, h2, h3, h4, .font-headline {
+  font-family: 'Atkinson Hyperlegible Next', sans-serif;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 9999px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(252, 130, 12, 0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(252, 130, 12, 0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.pulse-mic {
+  animation: pulseGlow 1.5s infinite;
+}
+
+/* Modal Backdrops */
+.modal-backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+/* Status Badges */
+.badge-pending {
+  background-color: #ffdad6;
+  color: #93000a;
+}
+
+.badge-progress {
+  background-color: #ffdcc6;
+  color: #723600;
+}
+
+.badge-resolved {
+  background-color: #cbffc2;
+  color: #005312;
+}
+
+.badge-critical {
+  background-color: #ba1a1a;
+  color: #ffffff;
+  font-weight: 700;
+  animation: pulseGlow 1.2s infinite;
+}
+
+/* Toast Notifications */
+#toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  min-width: 280px;
+  max-width: 380px;
+  background: #ffffff;
+  border-left: 4px solid var(--primary);
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.toast.toast-error {
+  border-left-color: var(--error);
+}
+
+.toast.toast-warning {
+  border-left-color: var(--secondary-container);
+}

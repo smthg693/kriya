@@ -1,0 +1,4 @@
+.env
+node_modules/
+gram_sahayak.db
+public/uploads/*
