@@ -1,7 +1,7 @@
 // Gram Swaraj Admin Dashboard Client JS Engine
 
 // Initialize Socket.IO Client
-const socket = io();
+const socket = io({ auth: { token: localStorage.getItem('gram_token') || '' } });
 
 let reportsData = [];
 let applicationsData = [];
@@ -25,6 +25,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupStatusModal();
   setupDashboardControls();
   markDashboardSynced();
+  document.getElementById('admin-citizen-portal-link')?.addEventListener('click', () => {
+    localStorage.removeItem('gram_token');
+    localStorage.removeItem('gram_user');
+  });
 });
 
 function setupDashboardControls() {
@@ -140,6 +144,13 @@ function showToast(message, type = 'info') {
 
 // WebSockets Real-Time Listeners
 function setupSocketListeners() {
+  socket.on('citizen_registered', (newCitizen) => {
+    if (!newCitizen || newCitizen.role !== 'user') return;
+    showToast(`New citizen registered: ${newCitizen.name || newCitizen.username}`);
+    loadAdminStats();
+    loadCitizens();
+  });
+
   socket.on('report_created', (newReport) => {
     showToast(`⚡ NEW REPORT: ${newReport.id} (${newReport.category}) in ${newReport.location}`, newReport.priority === 'Critical' ? 'warning' : 'info');
     loadAdminStats();
@@ -195,7 +206,9 @@ async function loadAdminStats() {
 async function loadReports() {
   try {
     const res = await fetch('/api/reports', { headers: adminHeaders() });
+    if (!res.ok) throw new Error('Could not load reports');
     reportsData = await res.json();
+    if (!Array.isArray(reportsData)) throw new Error('Invalid reports response');
     renderReportsTable();
   } catch (err) {
     console.error("Error loading reports:", err);
@@ -235,8 +248,8 @@ function renderReportsTable() {
           ${escapeHTML(rep.priority)}
         </span>
       </td>
-      <td class="py-3 px-4">
-        <span class="px-2.5 py-1 rounded-full text-xs font-bold ${
+      <td class="py-3 px-4 whitespace-nowrap">
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap ${
           rep.status === 'Resolved' ? 'bg-green-100 text-green-800' :
           rep.status === 'In Progress' ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-800'
         }">${escapeHTML(rep.status)}</span>
@@ -260,7 +273,9 @@ function setupFilterListeners() {
 async function loadApplications() {
   try {
     const res = await fetch('/api/applications', { headers: adminHeaders() });
+    if (!res.ok) throw new Error('Could not load applications');
     applicationsData = await res.json();
+    if (!Array.isArray(applicationsData)) throw new Error('Invalid applications response');
     renderApplicationsTable();
   } catch (err) {
     console.error("Error loading applications:", err);
@@ -279,17 +294,19 @@ function renderApplicationsTable() {
       <td class="py-3 px-4 font-bold text-gray-900">${escapeHTML(app.id)}</td>
       <td class="py-3 px-4 text-xs font-semibold text-gray-700">${escapeHTML(app.citizen_name)}</td>
       <td class="py-3 px-4 text-xs font-bold text-primary">${escapeHTML(app.scheme_type)}</td>
-      <td class="py-3 px-4">
-        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary">${escapeHTML(app.status)}</span>
+      <td class="py-3 px-4 whitespace-nowrap">
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold whitespace-nowrap bg-primary/10 text-primary">${escapeHTML(app.status)}</span>
       </td>
-      <td class="py-3 px-4 text-xs font-semibold text-gray-700">${app.progress_pct}%</td>
-      <td class="py-3 px-4 text-right flex justify-end gap-2">
+      <td class="py-3 px-4 text-xs font-semibold text-gray-700 whitespace-nowrap">${app.progress_pct}%</td>
+      <td class="py-3 px-4 text-right whitespace-nowrap">
+        <div class="flex justify-end gap-2">
         <button onclick="updateAppProgress('${app.id}', 'In Progress', 50)" class="px-2.5 py-1 bg-amber-500 text-white font-semibold text-xs rounded-lg hover:bg-amber-600 transition-all">
           Verify 50%
         </button>
         <button onclick="updateAppProgress('${app.id}', 'Approved', 100)" class="px-2.5 py-1 bg-emerald-600 text-white font-semibold text-xs rounded-lg hover:bg-emerald-700 transition-all">
           Approve 100%
         </button>
+        </div>
       </td>
     </tr>
   `).join('');
@@ -317,7 +334,10 @@ async function updateAppProgress(id, status, progressPct) {
 async function loadCitizens() {
   try {
     const res = await fetch('/api/citizens', { headers: adminHeaders() });
-    citizensData = await res.json();
+    if (!res.ok) throw new Error('Could not load citizens');
+    const citizensPayload = await res.json();
+    citizensData = Array.isArray(citizensPayload) ? citizensPayload : citizensPayload.users;
+    if (!Array.isArray(citizensData)) throw new Error('Invalid citizens response');
     renderCitizensGrid();
   } catch (err) {
     console.error("Error loading citizens:", err);

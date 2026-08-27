@@ -14,13 +14,13 @@ const { processUserQuery } = require('./nlp_engine');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: { origin: '*' }
+  cors: { origin: process.env.CLIENT_ORIGIN || false }
 });
 
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: process.env.CLIENT_ORIGIN || false }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -38,23 +38,40 @@ const storage = multer.diskStorage({
     cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
   }
 });
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, callback) => {
+    if (/^image\/(jpeg|png|gif|webp)$/.test(file.mimetype)) return callback(null, true);
+    callback(new Error('Only JPEG, PNG, GIF, and WebP images are allowed'));
+  }
+});
 
 // Serve static frontend files
 app.use(express.static(path.join(__dirname, 'public')));
 
 // WebSockets Setup
 io.on('connection', (socket) => {
+  const user = socket.data.user;
   console.log('Client connected to WebSockets:', socket.id);
-
-  socket.on('join_room', (room) => {
-    socket.join(room);
-    console.log(`Socket ${socket.id} joined room: ${room}`);
-  });
+  socket.join(user.role === 'admin' ? 'admins' : `citizen:${user.id}`);
 
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
   });
+});
+
+io.use(async (socket, next) => {
+  try {
+    const token = socket.handshake.auth?.token;
+    const session = token ? await dbAsync.findSession(token) : null;
+    const user = session ? await dbAsync.findUserById(session.user_id) : null;
+    if (!user || user.disabled) return next(new Error('Authentication required'));
+    socket.data.user = user;
+    next();
+  } catch (error) {
+    next(new Error('Authentication failed'));
+  }
 });
 
 // Helper for Emergency Priority Auto-Triage
@@ -105,9 +122,12 @@ app.post('/api/auth/register', async (req, res) => {
     const defaultAvatar = 'https://lh3.googleusercontent.com/aida-public/AB6AXuBPRc6GYVwSy_AKt35qAxkHsARWBl5vkCni8miFTxQR8qgHr2_JKmagVvtoyYpYeUXR33tu82w316-dtwxbBRrYb47oHQ2ZW--l_X2XL7RruFntCX-8Ly_gxGrZpHIn0Qhd8TvmLd6tk__mqLTCNrmGanbMBa6JUzvaQyEU1sKWj_nJT5Bt88ga-VgUhVIjAdAE7EQolO9zNeDp-yH6WtskdaUO-C9WE-TR55b5NZBd7VZuVE421Sj6-g';
 
     const passwordHash = await bcrypt.hash(password, 12);
-    await dbAsync.insertUser({ id: newId, username: username || mobile, email: email || undefined, name: name || username || email, mobile, village: village || 'Kalyanpur', password_hash: passwordHash, aadhaar_verified: 1, avatar_url: defaultAvatar, role: 'user', language: 'en', preferences: {}, created_at: new Date() });
+    const newUser = { id: newId, username: username || mobile, name: name || username || email, mobile, village: village || 'Kalyanpur', password_hash: passwordHash, aadhaar_verified: 1, avatar_url: defaultAvatar, role: 'user', language: 'en', preferences: {}, created_at: new Date() };
+    if (email) newUser.email = email;
+    await dbAsync.insertUser(newUser);
 
     const user = await dbAsync.findUserById(newId);
+    io.emit('citizen_registered', user);
     const token = generateToken();
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     await dbAsync.insert('sessions', { token, user_id: user.id, role: user.role, expires_at: expiresAt, created_at: new Date() });
@@ -222,7 +242,7 @@ app.post('/api/reports', requireAuth, upload.single('photo'), async (req, res) =
   try {
     const { category, location, description, citizen_id, citizen_name } = req.body;
     const repNum = Math.floor(100 + Math.random() * 900);
-    const reportId = `#REP-${repNum}`;
+    const reportId = `#REP-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
     const priority = detectPriority(description || '', category || '');
     const photo_url = req.file ? `/uploads/${req.file.filename}` : null;
     const todayStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -232,7 +252,8 @@ app.post('/api/reports', requireAuth, upload.single('photo'), async (req, res) =
     const newReport = await dbAsync.findOne('reports', { id: reportId });
 
     // Broadcast live event to all clients / admins!
-    io.emit('report_created', newReport);
+    io.to('admins').emit('report_created', newReport);
+    io.to(`citizen:${req.auth.user.id}`).emit('report_created', newReport);
 
     res.json({ success: true, report: newReport });
   } catch (err) {
@@ -252,7 +273,8 @@ app.put('/api/reports/:id/status', requireAuth, requireAdmin, async (req, res) =
     const updatedReport = await dbAsync.findOne('reports', { id: reportId });
 
     // Emit live WebSocket update to citizens and admins!
-    io.emit('report_updated', updatedReport);
+    io.to('admins').emit('report_updated', updatedReport);
+    if (updatedReport?.citizen_id) io.to(`citizen:${updatedReport.citizen_id}`).emit('report_updated', updatedReport);
 
     res.json({ success: true, report: updatedReport });
   } catch (err) {
@@ -264,7 +286,8 @@ app.put('/api/reports/:id/status', requireAuth, requireAdmin, async (req, res) =
 app.get('/api/applications', requireAuth, async (req, res) => {
   try {
     const { citizenId } = req.query;
-    const apps = await dbAsync.findMany('applications', req.auth.user.role === 'admin' && citizenId ? { citizen_id: citizenId } : { citizen_id: req.auth.user.id }, { sort: { created_at: -1 } });
+    const filter = req.auth.user.role === 'admin' ? (citizenId ? { citizen_id: citizenId } : {}) : { citizen_id: req.auth.user.id };
+    const apps = await dbAsync.findMany('applications', filter, { sort: { created_at: -1 } });
     res.json(apps);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -275,14 +298,15 @@ app.post('/api/applications', requireAuth, async (req, res) => {
   try {
     const { scheme_type, citizen_id, citizen_name, details } = req.body;
     const appNum = Math.floor(1000 + Math.random() * 9000);
-    const appId = `#APP-2023-${appNum}`;
+    const appId = `#APP-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
 
     await dbAsync.insert('applications', { id: appId, scheme_type: scheme_type || 'General Scheme', citizen_id: req.auth.user.id, citizen_name: req.auth.user.name, status: 'Submitted', progress_pct: 25, details_json: JSON.stringify(details || {}), created_at: new Date(), updated_at: new Date() });
 
     const newApp = await dbAsync.findOne('applications', { id: appId });
 
     // Emit live socket event
-    io.emit('application_submitted', newApp);
+    io.to('admins').emit('application_submitted', newApp);
+    io.to(`citizen:${req.auth.user.id}`).emit('application_submitted', newApp);
 
     res.json({ success: true, application: newApp });
   } catch (err) {
@@ -303,7 +327,8 @@ app.put('/api/applications/:id/status', requireAuth, requireAdmin, async (req, r
     const updatedApp = await dbAsync.findOne('applications', { id: appId });
 
     // Emit live socket update
-    io.emit('application_updated', updatedApp);
+    io.to('admins').emit('application_updated', updatedApp);
+    if (updatedApp?.citizen_id) io.to(`citizen:${updatedApp.citizen_id}`).emit('application_updated', updatedApp);
 
     res.json({ success: true, application: updatedApp });
   } catch (err) {

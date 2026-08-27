@@ -4,8 +4,9 @@
   "description": "Gram Sahayak - Real-Time Rural Assistance & Gram Swaraj Portal",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js",
+    "build:css": "tailwindcss -i ./public/css/tailwind.css -o ./public/css/tailwind.generated.css --minify",
+    "start": "npm run build:css && node server.js",
+    "dev": "npm run build:css && node server.js",
     "migrate:mongodb": "node migrate-to-mongodb.js"
   },
   "keywords": [
@@ -27,5 +28,11 @@
     "multer": "^1.4.5-lts.1",
     "socket.io": "^4.7.5",
     "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.9",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17"
   }
 }

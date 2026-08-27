@@ -1,12 +1,25 @@
 // Gram Sahayak Citizen Portal Client JS Engine
 
 // Initialize Socket.IO Client
-const socket = io();
+const socket = io({ auth: { token: localStorage.getItem('gram_token') || '' } });
 
 // Application State
 let currentLang = localStorage.getItem('gram_lang') || 'en'; // 'en' or 'hi'
 let currentToken = localStorage.getItem('gram_token') || null;
-let currentUser = JSON.parse(localStorage.getItem('gram_user')) || null;
+let currentUser = null;
+try {
+  currentUser = JSON.parse(localStorage.getItem('gram_user')) || null;
+} catch (error) {
+  localStorage.removeItem('gram_user');
+}
+
+// Never reuse an admin session in the citizen portal.
+if (currentUser?.role === 'admin') {
+  currentToken = null;
+  currentUser = null;
+  localStorage.removeItem('gram_token');
+  localStorage.removeItem('gram_user');
+}
 
 function authHeaders(headers = {}) {
   return { ...headers, ...(currentToken ? { Authorization: `Bearer ${currentToken}` } : {}) };
@@ -143,14 +156,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // WebSockets Real-Time Sync Listener
   socket.on('report_updated', (updatedReport) => {
-    if (updatedReport && updatedReport.citizen_id === currentUser.id) {
+    if (updatedReport && currentUser && updatedReport.citizen_id === currentUser.id) {
       showToast(`🔔 Complaint Update: Status of ${updatedReport.id} (${updatedReport.category}) changed to "${updatedReport.status}"`);
       loadCitizenData();
     }
   });
 
   socket.on('application_updated', (updatedApp) => {
-    if (updatedApp && updatedApp.citizen_id === currentUser.id) {
+    if (updatedApp && currentUser && updatedApp.citizen_id === currentUser.id) {
       showToast(`🎉 Application Update: Status of ${updatedApp.scheme_type} changed to "${updatedApp.status}"`);
       loadCitizenData();
     }
@@ -164,10 +177,16 @@ async function checkAuthSession() {
       headers: { 'Authorization': currentToken }
     });
     const data = await res.json();
-    if (data.success && data.user) {
+    if (data.success && data.user?.role === 'user') {
       currentUser = data.user;
       localStorage.setItem('gram_user', JSON.stringify(currentUser));
       updateUserProfileDisplay();
+    } else {
+      currentToken = null;
+      currentUser = null;
+      localStorage.removeItem('gram_token');
+      localStorage.removeItem('gram_user');
+      document.getElementById('auth-modal').classList.remove('hidden');
     }
   } catch (err) {
     console.error("Session verification error:", err);
@@ -267,6 +286,7 @@ function setupAuthModal() {
   const headerLogoutBtn = document.getElementById('header-signout-btn');
 
   openBtn.addEventListener('click', () => modal.classList.remove('hidden'));
+  closeBtn.classList.toggle('hidden', !currentToken);
   closeBtn.addEventListener('click', () => { if (currentToken) modal.classList.add('hidden'); });
 
   // Quick Citizen Login
@@ -598,7 +618,9 @@ function setupReportForm() {
 async function loadCitizenData() {
   try {
     const reportsRes = await fetch('/api/reports', { headers: authHeaders() });
+    if (!reportsRes.ok) throw new Error('Could not load reports');
     const reports = await reportsRes.json();
+    if (!Array.isArray(reports)) throw new Error('Invalid reports response');
     const reportsContainer = document.getElementById('citizen-reports-list');
 
     if (reportsContainer) {
@@ -625,7 +647,9 @@ async function loadCitizenData() {
     }
 
     const appsRes = await fetch('/api/applications', { headers: authHeaders() });
+    if (!appsRes.ok) throw new Error('Could not load applications');
     const apps = await appsRes.json();
+    if (!Array.isArray(apps)) throw new Error('Invalid applications response');
     const appsContainer = document.getElementById('citizen-applications-list');
 
     if (appsContainer) {
@@ -658,9 +682,7 @@ async function applyScheme(schemeName) {
       headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({
         scheme_type: schemeName,
-        citizen_id: currentUser.id,
-        citizen_name: currentUser.name,
-        details_json: JSON.stringify({ applied_on: new Date().toISOString() })
+        details: { applied_on: new Date().toISOString() }
       })
     });
     const data = await res.json();

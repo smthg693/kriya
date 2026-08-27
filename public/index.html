@@ -5,43 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Gram Sahayak - Gram Panchayat Rural Portal</title>
   
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <!-- Material Symbols & Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   
-  <!-- Custom Styles -->
+  <!-- Local Tailwind build and custom styles -->
+  <link rel="stylesheet" href="/css/tailwind.generated.css"/>
   <link rel="stylesheet" href="/css/style.css"/>
 
   <!-- Socket.IO Client -->
   <script src="/socket.io/socket.io.js"></script>
 
-  <script id="tailwind-config">
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            "primary": "#0d631b",
-            "primary-container": "#2e7d32",
-            "on-primary": "#ffffff",
-            "secondary": "#964900",
-            "secondary-container": "#fc820c",
-            "tertiary": "#00569f",
-            "tertiary-container": "#006eca",
-            "background": "#f9f9f9",
-            "surface": "#ffffff",
-            "surface-container": "#eeeeee",
-            "surface-container-low": "#f3f3f3",
-            "outline-variant": "#bfcaba",
-            "error": "#ba1a1a",
-            "error-container": "#ffdad6"
-          }
-        }
-      }
-    }
-  </script>
 </head>
 <body class="bg-background text-on-background min-h-screen flex flex-col font-body-md selection:bg-primary-container selection:text-on-primary">
 
@@ -70,7 +44,7 @@
       <!-- User Profile / Login Avatar Button -->
       <button id="auth-profile-btn" class="flex items-center gap-2 p-1 rounded-full border border-outline-variant hover:bg-surface-container transition-all active:scale-95">
         <img id="user-avatar-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7A5WlZ1Ip5Egmg5OLkYg8R0esTwZEhlIO6xxaMwzP4_HWsTPfT_SQirVknfQNyjoupdGAQLlLGs-0vhtb-BNptIPMiAdY9J93chpFErB8BCDpTaeu4kPGGqS6V6f2Dq1FsS5YyFdlnoTV0vAACNMC250RK7-gtSvT8d_w5oiLCpqNX3eTygKTuohPgWYtvrjJYyLGdWdsRmewQkI63TNYTBWFbni2TqTCvOOWtcOv1lywOpN9DNv4uQ" class="w-8 h-8 rounded-full object-cover"/>
-        <span id="user-name-display" class="hidden md:inline text-xs font-semibold px-1">Rajesh Kumar</span>
+        <span id="user-name-display" class="hidden md:inline text-xs font-semibold px-1">Sign in</span>
       </button>
       <button id="header-signout-btn" class="hidden items-center gap-1 px-3 py-2 rounded-full border border-red-200 text-error text-xs font-bold hover:bg-red-50 transition-colors">
         <span class="material-symbols-outlined text-base">logout</span>
@@ -250,7 +224,7 @@
           </div>
           <div class="bg-white border border-outline-variant p-4 rounded-2xl rounded-tl-sm text-sm text-gray-800 shadow-sm">
             <p class="font-semibold text-primary text-xs mb-1">Gram Sahayak</p>
-
+            <p id="chat-intro-text">Namaste! I am Gram Sahayak, your digital assistant. How can I help you today?</p>
           </div>
         </div>
       </div>

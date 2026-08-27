@@ -31,11 +31,14 @@ async function initDatabase() {
   await Promise.all([
     collection('users').createIndex({ username: 1 }, { unique: true }),
     collection('users').createIndex({ email: 1 }, { unique: true, sparse: true }),
+    collection('users').createIndex({ mobile: 1 }, { unique: true, sparse: true }),
     collection('citizens').createIndex({ id: 1 }, { unique: true }),
     collection('citizens').createIndex({ mobile: 1 }, { unique: true }),
     collection('admins').createIndex({ username: 1 }, { unique: true }),
     collection('reports').createIndex({ citizen_id: 1, created_at: -1 }),
+    collection('reports').createIndex({ id: 1 }, { unique: true }),
     collection('applications').createIndex({ citizen_id: 1, created_at: -1 }),
+    collection('applications').createIndex({ id: 1 }, { unique: true }),
     collection('sessions').createIndex({ token: 1 }, { unique: true }),
     collection('sessions').createIndex({ expires_at: 1 }, { expireAfterSeconds: 0 })
   ]);
@@ -77,11 +80,12 @@ async function syncLegacyUsers() {
     ...admins.map(user => ({ ...user, username: user.username || (user.name || 'admin').toLowerCase().replace(/\s+/g, '.'), role: 'admin' }))
   ];
   for (const user of users) {
-    const update = { ...user };
+    const { password, ...userWithoutPassword } = user;
+    const update = { ...userWithoutPassword };
     if (!update.email) delete update.email;
     await collection('users').updateOne(
       { id: user.id },
-      { $set: update, $unset: { ...(user.email ? {} : { email: '' }) } },
+      { $set: update, $unset: { password: '', ...(user.email ? {} : { email: '' }) } },
       { upsert: true }
     );
   }
@@ -91,8 +95,8 @@ const dbAsync = {
   users: async (role, loginId, password) => {
     const users = collection(role === 'admin' ? 'admins' : 'citizens');
     const filter = role === 'admin'
-      ? { $or: [{ username: loginId }, { name: loginId }, { officer_id: loginId }] }
-      : { $or: [{ mobile: loginId }, { name: loginId }, { id: loginId }] };
+      ? { $or: [{ username: loginId }, { officer_id: loginId }] }
+      : { $or: [{ username: loginId }, { email: loginId }, { mobile: loginId }, { id: loginId }] };
     const user = await users.findOne(filter);
     if (!user || !(await bcrypt.compare(password || '', user.password_hash || ''))) return null;
     return withoutSecrets(user);
@@ -107,7 +111,7 @@ const dbAsync = {
   findUserById: async (id) => withoutSecrets(await collection('users').findOne({ $or: [{ id }, { _id: id }] })),
   insertUser: (user) => collection('users').insertOne(user),
   updateUser: (id, update) => collection('users').updateOne({ _id: id }, update),
-  deleteUser: (id) => collection('users').deleteOne({ _id: id }),
+  deleteUser: (id) => collection('users').deleteOne({ id }),
   listUsers: () => collection('users').find({}, { projection: { password_hash: 0, password: 0 } }).sort({ created_at: -1 }).toArray(),
   findSession: (token) => collection('sessions').findOne({ token, expires_at: { $gt: new Date() } }),
   findOne: (name, filter) => collection(name).findOne(filter),

@@ -13,6 +13,12 @@ function readAll(sqlite, table) {
   });
 }
 
+function tableExists(sqlite, table) {
+  return new Promise((resolve, reject) => {
+    sqlite.get("SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?", [table], (error, row) => error ? reject(error) : resolve(Boolean(row)));
+  });
+}
+
 async function migrate() {
   if (!mongoUri) throw new Error('MONGODB_URI is required.');
 
@@ -23,11 +29,11 @@ async function migrate() {
   const tables = ['citizens', 'admins', 'reports', 'applications', 'chat_messages', 'announcements', 'sessions'];
   const rowsByTable = {};
 
-  for (const table of tables) rowsByTable[table] = await readAll(sqlite, table);
+  for (const table of tables) rowsByTable[table] = await tableExists(sqlite, table) ? await readAll(sqlite, table) : [];
 
   for (const citizen of rowsByTable.citizens) {
     const { password, ...safeCitizen } = citizen;
-    safeCitizen.password_hash = await bcrypt.hash(password || 'user123', 12);
+    safeCitizen.password_hash = password && password.startsWith('$2') ? password : await bcrypt.hash(password || 'user123', 12);
     await database.collection('citizens').updateOne({ id: citizen.id }, { $set: safeCitizen }, { upsert: true });
   }
 
@@ -35,7 +41,7 @@ async function migrate() {
     const { password, officer_id, ...safeAdmin } = admin;
     safeAdmin.username = admin.username || (admin.name || 'admin').toLowerCase().replace(/\s+/g, '.');
     safeAdmin.officer_id = officer_id;
-    safeAdmin.password_hash = await bcrypt.hash(password || 'admin123', 12);
+    safeAdmin.password_hash = password && password.startsWith('$2') ? password : await bcrypt.hash(password || 'admin123', 12);
     await database.collection('admins').updateOne({ id: admin.id }, { $set: safeAdmin }, { upsert: true });
   }
 
@@ -43,7 +49,7 @@ async function migrate() {
     const { password, ...safeCitizen } = citizen;
     safeCitizen.username = citizen.username || citizen.mobile;
     safeCitizen.role = 'user';
-    safeCitizen.password_hash = await bcrypt.hash(password || 'user123', 12);
+    safeCitizen.password_hash = password && password.startsWith('$2') ? password : await bcrypt.hash(password || 'user123', 12);
     await database.collection('users').updateOne({ id: citizen.id }, { $set: safeCitizen }, { upsert: true });
   }
 
@@ -51,15 +57,15 @@ async function migrate() {
     const { password, ...safeAdmin } = admin;
     safeAdmin.username = admin.username || (admin.name || 'admin').toLowerCase().replace(/\s+/g, '.');
     safeAdmin.role = 'admin';
-    safeAdmin.password_hash = await bcrypt.hash(password || 'admin123', 12);
+    safeAdmin.password_hash = password && password.startsWith('$2') ? password : await bcrypt.hash(password || 'admin123', 12);
     await database.collection('users').updateOne({ id: admin.id }, { $set: safeAdmin }, { upsert: true });
   }
 
   for (const table of ['reports', 'applications', 'chat_messages', 'announcements']) {
     for (const row of rowsByTable[table]) {
-      const key = row.id !== undefined ? { id: row.id } : { token: row.token };
       const target = table === 'chat_messages' ? 'chatHistory' : table;
-      await database.collection(target).updateOne(key, { $set: row }, { upsert: true });
+      const key = table === 'chat_messages' ? { legacy_id: row.id } : { id: row.id };
+      await database.collection(target).updateOne(key, { $set: { ...row, ...(table === 'chat_messages' ? { legacy_id: row.id } : {}) } }, { upsert: true });
     }
   }
 
