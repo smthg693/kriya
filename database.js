@@ -24,7 +24,7 @@ async function initDatabase() {
     throw new Error('MONGODB_URI is required. Add it to your environment before starting the server.');
   }
 
-  client = new MongoClient(mongoUri);
+  client = new MongoClient(mongoUri, { tls: true });
   await client.connect();
   database = client.db(databaseName);
 
