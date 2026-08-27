@@ -7,8 +7,14 @@ let reportsData = [];
 let applicationsData = [];
 let citizensData = [];
 let currentAdminLang = localStorage.getItem('gram_lang') || 'en';
+let adminToken = localStorage.getItem('gram_token') || null;
 
-document.addEventListener('DOMContentLoaded', () => {
+function adminHeaders(headers = {}) {
+  return { ...headers, ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {}) };
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!await ensureAdminAuth()) return;
   setupAdminLanguage();
   loadAdminStats();
   loadReports();
@@ -17,7 +23,62 @@ document.addEventListener('DOMContentLoaded', () => {
   setupSocketListeners();
   setupFilterListeners();
   setupStatusModal();
+  setupDashboardControls();
+  markDashboardSynced();
 });
+
+function setupDashboardControls() {
+  const refreshButton = document.getElementById('admin-refresh-btn');
+  if (!refreshButton) return;
+  refreshButton.addEventListener('click', async () => {
+    refreshButton.disabled = true;
+    refreshButton.classList.add('opacity-60');
+    await Promise.all([loadAdminStats(), loadReports(), loadApplications(), loadCitizens()]);
+    markDashboardSynced();
+    refreshButton.disabled = false;
+    refreshButton.classList.remove('opacity-60');
+  });
+}
+
+function markDashboardSynced() {
+  const status = document.getElementById('admin-sync-status');
+  if (status) status.textContent = `Updated ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+}
+
+async function ensureAdminAuth() {
+  if (adminToken) {
+    try {
+      const response = await fetch('/api/auth/me', { headers: adminHeaders() });
+      const data = await response.json();
+      if (data.success && data.user?.role === 'admin') {
+        document.getElementById('admin-auth-modal').classList.add('hidden');
+        return true;
+      }
+    } catch (error) {}
+  }
+  localStorage.removeItem('gram_token');
+  localStorage.removeItem('gram_user');
+  document.getElementById('admin-login-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const errorElement = document.getElementById('admin-login-error');
+    try {
+      const response = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ loginId: document.getElementById('admin-login-id').value.trim(), password: document.getElementById('admin-login-password').value }) });
+      const data = await response.json();
+      if (!data.success || data.user?.role !== 'admin') throw new Error('Admin credentials required.');
+      localStorage.setItem('gram_token', data.token);
+      localStorage.setItem('gram_user', JSON.stringify(data.user));
+      window.location.reload();
+    } catch (error) {
+      errorElement.textContent = error.message;
+      errorElement.classList.remove('hidden');
+    }
+  });
+  document.getElementById('admin-back-btn').addEventListener('click', () => {
+    if (window.history.length > 1) window.history.back();
+    else window.location.href = '/';
+  });
+  return false;
+}
 
 function setupAdminLanguage() {
   const btn = document.getElementById('admin-lang-toggle-btn');
@@ -118,7 +179,7 @@ function switchAdminTab(tabId) {
 // Load Stats
 async function loadAdminStats() {
   try {
-    const res = await fetch('/api/stats');
+    const res = await fetch('/api/stats', { headers: adminHeaders() });
     const stats = await res.json();
     document.getElementById('stat-active-reports').textContent = stats.activeReports;
     document.getElementById('stat-critical-emergencies').textContent = stats.criticalEmergencies;
@@ -133,7 +194,7 @@ async function loadAdminStats() {
 // Load & Render Reports
 async function loadReports() {
   try {
-    const res = await fetch('/api/reports');
+    const res = await fetch('/api/reports', { headers: adminHeaders() });
     reportsData = await res.json();
     renderReportsTable();
   } catch (err) {
@@ -198,7 +259,7 @@ function setupFilterListeners() {
 // Load & Render Applications
 async function loadApplications() {
   try {
-    const res = await fetch('/api/applications');
+    const res = await fetch('/api/applications', { headers: adminHeaders() });
     applicationsData = await res.json();
     renderApplicationsTable();
   } catch (err) {
@@ -238,7 +299,7 @@ async function updateAppProgress(id, status, progressPct) {
   try {
     const res = await fetch(`/api/applications/${encodeURIComponent(id)}/status`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: adminHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ status, progress_pct: progressPct, admin_notes: `Processed by Secretary on ${new Date().toLocaleDateString()}` })
     });
     const data = await res.json();
@@ -255,7 +316,7 @@ async function updateAppProgress(id, status, progressPct) {
 // Load & Render Citizens Directory
 async function loadCitizens() {
   try {
-    const res = await fetch('/api/citizens');
+    const res = await fetch('/api/citizens', { headers: adminHeaders() });
     citizensData = await res.json();
     renderCitizensGrid();
   } catch (err) {
@@ -267,13 +328,13 @@ function renderCitizensGrid() {
   const grid = document.getElementById('citizens-cards-grid');
   grid.innerHTML = citizensData.map(c => `
     <div class="bg-gray-50 border border-outline-variant p-4 rounded-2xl flex items-center gap-3">
-      <img src="${c.avatar_url}" class="w-12 h-12 rounded-full object-cover shrink-0 border border-primary/20"/>
+      <img src="${escapeHTML(c.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(c.name || 'Citizen'))}" alt="${escapeHTML(c.name || 'Citizen')}" class="w-12 h-12 rounded-full object-cover shrink-0 border border-primary/20"/>
       <div>
-        <h4 class="font-bold text-sm text-gray-900">${escapeHTML(c.name)}</h4>
-        <p class="text-xs text-gray-500">ID: ${escapeHTML(c.id)} • Mobile: ${escapeHTML(c.mobile)}</p>
+        <h4 class="font-bold text-sm text-gray-900">${escapeHTML(c.name || c.username || 'Unnamed Citizen')}</h4>
+        <p class="text-xs text-gray-500">ID: ${escapeHTML(c.id)} • ${escapeHTML(c.mobile || c.email || c.username || 'No contact details')}</p>
         <div class="mt-1 flex items-center gap-1">
-          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-          <span class="text-[10px] font-semibold text-emerald-700 uppercase">Aadhaar Verified</span>
+          <span class="w-2 h-2 rounded-full ${c.disabled ? 'bg-red-500' : 'bg-emerald-500'}"></span>
+          <span class="text-[10px] font-semibold ${c.disabled ? 'text-red-700' : 'text-emerald-700'} uppercase">${c.disabled ? 'Account Disabled' : 'Aadhaar Verified'}</span>
         </div>
       </div>
     </div>
@@ -297,7 +358,7 @@ function setupStatusModal() {
     try {
       const res = await fetch(`/api/reports/${encodeURIComponent(id)}/status`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: adminHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ status, admin_notes })
       });
       const data = await res.json();
@@ -314,9 +375,15 @@ function setupStatusModal() {
 
   const logoutBtn = document.getElementById('admin-logout-btn');
   if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
+    logoutBtn.addEventListener('click', async () => {
+      if (adminToken) {
+        try {
+          await fetch('/api/auth/logout', { method: 'POST', headers: adminHeaders() });
+        } catch (error) {}
+      }
       localStorage.removeItem('gram_user');
       localStorage.removeItem('gram_token');
+      adminToken = null;
       showToast('Admin logged out.');
       setTimeout(() => window.location.href = '/', 600);
     });

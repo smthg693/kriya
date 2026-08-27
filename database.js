@@ -29,6 +29,8 @@ async function initDatabase() {
   database = client.db(databaseName);
 
   await Promise.all([
+    collection('users').createIndex({ username: 1 }, { unique: true }),
+    collection('users').createIndex({ email: 1 }, { unique: true, sparse: true }),
     collection('citizens').createIndex({ id: 1 }, { unique: true }),
     collection('citizens').createIndex({ mobile: 1 }, { unique: true }),
     collection('admins').createIndex({ username: 1 }, { unique: true }),
@@ -39,6 +41,7 @@ async function initDatabase() {
   ]);
 
   await seedInitialData();
+  await syncLegacyUsers();
 }
 
 async function seedInitialData() {
@@ -64,6 +67,26 @@ async function seedInitialData() {
   );
 }
 
+async function syncLegacyUsers() {
+  const [citizens, admins] = await Promise.all([
+    collection('citizens').find({}).toArray(),
+    collection('admins').find({}).toArray()
+  ]);
+  const users = [
+    ...citizens.map(user => ({ ...user, username: user.username || user.mobile, role: 'user' })),
+    ...admins.map(user => ({ ...user, username: user.username || (user.name || 'admin').toLowerCase().replace(/\s+/g, '.'), role: 'admin' }))
+  ];
+  for (const user of users) {
+    const update = { ...user };
+    if (!update.email) delete update.email;
+    await collection('users').updateOne(
+      { id: user.id },
+      { $set: update, $unset: { ...(user.email ? {} : { email: '' }) } },
+      { upsert: true }
+    );
+  }
+}
+
 const dbAsync = {
   users: async (role, loginId, password) => {
     const users = collection(role === 'admin' ? 'admins' : 'citizens');
@@ -76,13 +99,24 @@ const dbAsync = {
   },
   firstUser: async (role) => withoutSecrets(await collection(role === 'admin' ? 'admins' : 'citizens').findOne({})),
   publicUser: async (role, filter) => withoutSecrets(await collection(role === 'admin' ? 'admins' : 'citizens').findOne(filter)),
+  findUserByLogin: async (loginId, password) => {
+    const user = await collection('users').findOne({ $or: [{ username: loginId }, { email: loginId }, { mobile: loginId }, { name: loginId }] });
+    if (!user || user.disabled || !(await bcrypt.compare(password || '', user.password_hash || ''))) return null;
+    return withoutSecrets(user);
+  },
+  findUserById: async (id) => withoutSecrets(await collection('users').findOne({ $or: [{ id }, { _id: id }] })),
+  insertUser: (user) => collection('users').insertOne(user),
+  updateUser: (id, update) => collection('users').updateOne({ _id: id }, update),
+  deleteUser: (id) => collection('users').deleteOne({ _id: id }),
+  listUsers: () => collection('users').find({}, { projection: { password_hash: 0, password: 0 } }).sort({ created_at: -1 }).toArray(),
+  findSession: (token) => collection('sessions').findOne({ token, expires_at: { $gt: new Date() } }),
   findOne: (name, filter) => collection(name).findOne(filter),
   findMany: (name, filter = {}, options = {}) => collection(name).find(filter, options).toArray(),
   insert: (name, document) => collection(name).insertOne(document),
   update: (name, filter, update) => collection(name).updateOne(filter, update),
   remove: (name, filter) => collection(name).deleteOne(filter),
   count: (name, filter = {}) => collection(name).countDocuments(filter),
-  saveChat: (document) => collection('chat_messages').insertMany([document.user, document.assistant]),
+  saveChat: (document) => collection('chatHistory').insertMany([document.user, document.assistant]),
   close: () => client?.close()
 };
 

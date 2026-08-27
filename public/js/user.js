@@ -6,14 +6,11 @@ const socket = io();
 // Application State
 let currentLang = localStorage.getItem('gram_lang') || 'en'; // 'en' or 'hi'
 let currentToken = localStorage.getItem('gram_token') || null;
-let currentUser = JSON.parse(localStorage.getItem('gram_user')) || {
-  id: 'CIT-001',
-  name: 'Rajesh Kumar',
-  mobile: '9876543210',
-  village: 'yewlewadi',
-  role: 'citizen',
-  avatar_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD7A5WlZ1Ip5Egmg5OLkYg8R0esTwZEhlIO6xxaMwzP4_HWsTPfT_SQirVknfQNyjoupdGAQLlLGs-0vhtb-BNptIPMiAdY9J93chpFErB8BCDpTaeu4kPGGqS6V6f2Dq1FsS5YyFdlnoTV0vAACNMC250RK7-gtSvT8d_w5oiLCpqNX3eTygKTuohPgWYtvrjJYyLGdWdsRmewQkI63TNYTBWFbni2TqTCvOOWtcOv1lywOpN9DNv4uQ'
-};
+let currentUser = JSON.parse(localStorage.getItem('gram_user')) || null;
+
+function authHeaders(headers = {}) {
+  return { ...headers, ...(currentToken ? { Authorization: `Bearer ${currentToken}` } : {}) };
+}
 
 // HTML Escaping Utility for XSS Prevention
 function escapeHTML(str) {
@@ -135,6 +132,10 @@ document.addEventListener('DOMContentLoaded', () => {
   setupLanguageSwitcher();
   setupTabNavigation();
   setupAuthModal();
+  if (!currentToken) {
+    document.getElementById('auth-modal').classList.remove('hidden');
+    return;
+  }
   setupChatBot();
   setupReportForm();
   loadCitizenData();
@@ -219,7 +220,7 @@ function updateLanguageUI() {
   document.getElementById('lang-label').textContent = dict.langBtn;
   document.getElementById('header-subtitle').textContent = dict.headerSub;
   document.getElementById('home-welcome-badge').textContent = dict.welcomeBadge;
-  document.getElementById('home-greeting').textContent = dict.greeting.replace('{name}', currentUser.name);
+  document.getElementById('home-greeting').textContent = dict.greeting.replace('{name}', currentUser?.name || 'Citizen');
   document.getElementById('home-subtext').textContent = dict.subtext;
   document.getElementById('home-btn-voice').textContent = dict.btnVoice;
   document.getElementById('home-btn-report').textContent = dict.btnReport;
@@ -263,9 +264,10 @@ function setupAuthModal() {
   const openBtn = document.getElementById('auth-profile-btn');
   const closeBtn = document.getElementById('auth-modal-close');
   const logoutBtn = document.getElementById('logout-btn');
+  const headerLogoutBtn = document.getElementById('header-signout-btn');
 
   openBtn.addEventListener('click', () => modal.classList.remove('hidden'));
-  closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+  closeBtn.addEventListener('click', () => { if (currentToken) modal.classList.add('hidden'); });
 
   // Quick Citizen Login
   document.getElementById('quick-citizen-login').addEventListener('click', async () => {
@@ -283,7 +285,7 @@ function setupAuthModal() {
         localStorage.setItem('gram_token', currentToken);
         updateUserProfileDisplay();
         modal.classList.add('hidden');
-        showToast(`Signed in successfully as ${currentUser.name}!`);
+        window.location.reload();
       }
     } catch (e) {
       showToast('Quick login failed.', 'error');
@@ -315,7 +317,7 @@ function setupAuthModal() {
         localStorage.setItem('gram_token', currentToken);
         updateUserProfileDisplay();
         modal.classList.add('hidden');
-        showToast(`Welcome back, ${currentUser.name}!`);
+        window.location.reload();
       } else {
         showToast('Login failed. Please check credentials.', 'error');
       }
@@ -324,20 +326,43 @@ function setupAuthModal() {
     }
   });
 
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', async () => {
-      if (currentToken) {
-        try {
-          await fetch('/api/auth/logout', {
-            method: 'POST',
-            headers: { 'Authorization': currentToken }
-          });
-        } catch (e) {}
-      }
+  const signOut = async () => {
+      if (currentToken) await fetch('/api/auth/logout', { method: 'POST', headers: authHeaders() }).catch(() => {});
       localStorage.removeItem('gram_user');
       localStorage.removeItem('gram_token');
       showToast('Signed out successfully.');
       setTimeout(() => window.location.reload(), 800);
+  };
+  if (logoutBtn) logoutBtn.addEventListener('click', signOut);
+  if (headerLogoutBtn) headerLogoutBtn.addEventListener('click', signOut);
+
+  const signupForm = document.getElementById('signup-form');
+  const signupToggle = document.getElementById('signup-toggle');
+  const loginForm = document.getElementById('login-form');
+  if (signupToggle && signupForm) {
+    signupToggle.addEventListener('click', () => {
+      loginForm.classList.toggle('hidden');
+      signupForm.classList.toggle('hidden');
+      signupToggle.textContent = signupForm.classList.contains('hidden') ? 'Create an account' : 'Back to sign in';
+    });
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const body = {
+        username: document.getElementById('signup-username').value.trim(),
+        email: document.getElementById('signup-email').value.trim() || undefined,
+        name: document.getElementById('signup-name').value.trim(),
+        password: document.getElementById('signup-password').value
+      };
+      try {
+        const res = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        const data = await res.json();
+        if (!data.success) return showToast(data.error || 'Sign-up failed.', 'error');
+        localStorage.setItem('gram_user', JSON.stringify(data.user));
+        localStorage.setItem('gram_token', data.token);
+        window.location.reload();
+      } catch (err) {
+        showToast('Sign-up error occurred.', 'error');
+      }
     });
   }
 
@@ -345,6 +370,12 @@ function setupAuthModal() {
 }
 
 function updateUserProfileDisplay() {
+  if (!currentUser) return;
+  const headerLogoutBtn = document.getElementById('header-signout-btn');
+  if (headerLogoutBtn) {
+    headerLogoutBtn.classList.toggle('hidden', !currentToken);
+    headerLogoutBtn.classList.toggle('flex', Boolean(currentToken));
+  }
   document.getElementById('user-name-display').textContent = currentUser.name;
   if (currentUser.avatar_url) {
     document.getElementById('user-avatar-img').src = currentUser.avatar_url;
@@ -375,7 +406,7 @@ function setupChatBot() {
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ text, citizenId: currentUser.id, language: currentLang })
       });
       const data = await res.json();
@@ -546,6 +577,7 @@ function setupReportForm() {
     try {
       const res = await fetch('/api/reports', {
         method: 'POST',
+        headers: authHeaders(),
         body: formData
       });
       const data = await res.json();
@@ -565,7 +597,7 @@ function setupReportForm() {
 // Load Real-Time Citizen Profile & Application Tracker Data
 async function loadCitizenData() {
   try {
-    const reportsRes = await fetch(`/api/reports?citizenId=${currentUser.id}`);
+    const reportsRes = await fetch('/api/reports', { headers: authHeaders() });
     const reports = await reportsRes.json();
     const reportsContainer = document.getElementById('citizen-reports-list');
 
@@ -592,7 +624,7 @@ async function loadCitizenData() {
       }
     }
 
-    const appsRes = await fetch(`/api/applications?citizenId=${currentUser.id}`);
+    const appsRes = await fetch('/api/applications', { headers: authHeaders() });
     const apps = await appsRes.json();
     const appsContainer = document.getElementById('citizen-applications-list');
 
@@ -623,7 +655,7 @@ async function applyScheme(schemeName) {
   try {
     const res = await fetch('/api/applications', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({
         scheme_type: schemeName,
         citizen_id: currentUser.id,

@@ -39,10 +39,27 @@ async function migrate() {
     await database.collection('admins').updateOne({ id: admin.id }, { $set: safeAdmin }, { upsert: true });
   }
 
+  for (const citizen of rowsByTable.citizens) {
+    const { password, ...safeCitizen } = citizen;
+    safeCitizen.username = citizen.username || citizen.mobile;
+    safeCitizen.role = 'user';
+    safeCitizen.password_hash = await bcrypt.hash(password || 'user123', 12);
+    await database.collection('users').updateOne({ id: citizen.id }, { $set: safeCitizen }, { upsert: true });
+  }
+
+  for (const admin of rowsByTable.admins) {
+    const { password, ...safeAdmin } = admin;
+    safeAdmin.username = admin.username || (admin.name || 'admin').toLowerCase().replace(/\s+/g, '.');
+    safeAdmin.role = 'admin';
+    safeAdmin.password_hash = await bcrypt.hash(password || 'admin123', 12);
+    await database.collection('users').updateOne({ id: admin.id }, { $set: safeAdmin }, { upsert: true });
+  }
+
   for (const table of ['reports', 'applications', 'chat_messages', 'announcements']) {
     for (const row of rowsByTable[table]) {
       const key = row.id !== undefined ? { id: row.id } : { token: row.token };
-      await database.collection(table).updateOne(key, { $set: row }, { upsert: true });
+      const target = table === 'chat_messages' ? 'chatHistory' : table;
+      await database.collection(target).updateOne(key, { $set: row }, { upsert: true });
     }
   }
 

@@ -5,8 +5,10 @@ const cors = require('cors');
 const multer = require('multer');
 const fs = require('fs');
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 const { Server } = require('socket.io');
 const { initDatabase, dbAsync } = require('./database');
+const { generateToken, passwordIsStrong, loginRateLimit, clearLoginAttempts, requireAuth, requireAdmin } = require('./auth');
 const { processUserQuery } = require('./nlp_engine');
 
 const app = express();
@@ -70,28 +72,21 @@ function detectPriority(text, category) {
   return 'Low';
 }
 
-function generateToken() {
-  return crypto.randomBytes(32).toString('hex');
-}
-
 // ==================== REST API ENDPOINTS ==================== //
 
 // 1. AUTHENTICATION (Database-backed Session Auth)
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', loginRateLimit, async (req, res) => {
   try {
-    const { loginId, password, role } = req.body;
-    let user;
-    if (role === 'admin') {
-      user = await dbAsync.users('admin', loginId, password);
-    } else {
-      user = await dbAsync.users('citizen', loginId, password);
-    }
+    const { loginId, password } = req.body;
+    if (!loginId || !password) return res.status(400).json({ success: false, error: 'Username/email and password are required' });
+    const user = await dbAsync.findUserByLogin(loginId, password);
 
     if (!user) return res.status(401).json({ success: false, error: 'Invalid credentials' });
+    clearLoginAttempts(req);
 
     const token = generateToken();
-    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-    await dbAsync.insert('sessions', { token, user_id: user.id, role: user.role, expires_at: new Date(expiresAt), created_at: new Date() });
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    await dbAsync.insert('sessions', { token, user_id: user.id, role: user.role, expires_at: expiresAt, created_at: new Date() });
 
     return res.json({ success: true, token, user });
   } catch (err) {
@@ -101,32 +96,31 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { name, mobile, village, password } = req.body;
-    const existing = await dbAsync.findOne('citizens', { mobile });
-    if (existing) {
-      return res.status(400).json({ success: false, error: 'Mobile number is already registered!' });
-    }
+    const { username, email, name, mobile, village, password } = req.body;
+    if (!username && !email) return res.status(400).json({ success: false, error: 'Username or email is required' });
+    if (!passwordIsStrong(password)) return res.status(400).json({ success: false, error: 'Password must be at least 8 characters and include a letter and a number' });
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ success: false, error: 'Enter a valid email address' });
 
-    const newId = 'CIT-' + Math.floor(100 + Math.random() * 900);
+    const newId = 'CIT-' + Date.now();
     const defaultAvatar = 'https://lh3.googleusercontent.com/aida-public/AB6AXuBPRc6GYVwSy_AKt35qAxkHsARWBl5vkCni8miFTxQR8qgHr2_JKmagVvtoyYpYeUXR33tu82w316-dtwxbBRrYb47oHQ2ZW--l_X2XL7RruFntCX-8Ly_gxGrZpHIn0Qhd8TvmLd6tk__mqLTCNrmGanbMBa6JUzvaQyEU1sKWj_nJT5Bt88ga-VgUhVIjAdAE7EQolO9zNeDp-yH6WtskdaUO-C9WE-TR55b5NZBd7VZuVE421Sj6-g';
 
-    const passwordHash = await require('bcryptjs').hash(password || 'user123', 12);
-    await dbAsync.insert('citizens', { id: newId, name, mobile, village: village || 'Kalyanpur', password_hash: passwordHash, aadhaar_verified: 1, avatar_url: defaultAvatar, role: 'citizen', language: 'en', created_at: new Date() });
+    const passwordHash = await bcrypt.hash(password, 12);
+    await dbAsync.insertUser({ id: newId, username: username || mobile, email: email || undefined, name: name || username || email, mobile, village: village || 'Kalyanpur', password_hash: passwordHash, aadhaar_verified: 1, avatar_url: defaultAvatar, role: 'user', language: 'en', preferences: {}, created_at: new Date() });
 
-    const user = await dbAsync.publicUser('citizen', { id: newId });
+    const user = await dbAsync.findUserById(newId);
     const token = generateToken();
-    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-    await dbAsync.insert('sessions', { token, user_id: user.id, role: user.role, expires_at: new Date(expiresAt), created_at: new Date() });
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    await dbAsync.insert('sessions', { token, user_id: user.id, role: user.role, expires_at: expiresAt, created_at: new Date() });
 
     res.json({ success: true, token, user });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(err.code === 11000 ? 409 : 500).json({ success: false, error: err.code === 11000 ? 'Username, email, or mobile is already registered' : err.message });
   }
 });
 
 app.post('/api/auth/logout', async (req, res) => {
   try {
-    const token = req.headers.authorization || req.body.token;
+    const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '') || req.body.token;
     if (token) {
       await dbAsync.remove('sessions', { token });
     }
@@ -136,35 +130,62 @@ app.post('/api/auth/logout', async (req, res) => {
   }
 });
 
-app.get('/api/auth/me', async (req, res) => {
+app.get('/api/auth/me', requireAuth, (req, res) => res.json({ success: true, user: req.auth.user }));
+
+app.get('/api/profile', requireAuth, (req, res) => res.json({ success: true, profile: req.auth.user }));
+
+app.put('/api/profile', requireAuth, async (req, res) => {
   try {
-    const token = req.headers.authorization;
-    if (!token) return res.status(401).json({ success: false, error: 'Unauthorized' });
-
-    const session = await dbAsync.findOne('sessions', { token, expires_at: { $gt: new Date() } });
-    if (!session) return res.status(401).json({ success: false, error: 'Session expired' });
-
-    let user;
-    if (session.role === 'admin') {
-      user = await dbAsync.publicUser('admin', { id: session.user_id });
-    } else {
-      user = await dbAsync.publicUser('citizen', { id: session.user_id });
-    }
-
-    res.json({ success: true, user });
+    const allowed = ['name', 'mobile', 'village', 'avatar_url', 'language', 'preferences'];
+    const changes = Object.fromEntries(Object.entries(req.body).filter(([key]) => allowed.includes(key)));
+    await dbAsync.update('users', { id: req.auth.user.id }, { $set: changes });
+    res.json({ success: true, profile: await dbAsync.findUserById(req.auth.user.id) });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(err.code === 11000 ? 409 : 500).json({ success: false, error: err.code === 11000 ? 'Mobile number is already registered' : err.message });
   }
 });
 
+app.get('/api/admin/users', requireAuth, requireAdmin, async (req, res) => {
+  res.json({ success: true, users: await dbAsync.listUsers() });
+});
+
+app.get('/api/admin/users/:id', requireAuth, requireAdmin, async (req, res) => {
+  const user = await dbAsync.findUserById(req.params.id);
+  if (!user) return res.status(404).json({ success: false, error: 'User not found' });
+  res.json({ success: true, user });
+});
+
+app.put('/api/admin/users/:id', requireAuth, requireAdmin, async (req, res) => {
+  const allowed = ['name', 'mobile', 'village', 'email', 'username', 'preferences', 'disabled'];
+  const changes = Object.fromEntries(Object.entries(req.body).filter(([key]) => allowed.includes(key)));
+  await dbAsync.update('users', { id: req.params.id }, { $set: changes });
+  const user = await dbAsync.findUserById(req.params.id);
+  if (!user) return res.status(404).json({ success: false, error: 'User not found' });
+  res.json({ success: true, user });
+});
+
+app.delete('/api/admin/users/:id', requireAuth, requireAdmin, async (req, res) => {
+  if (req.params.id === req.auth.user.id) return res.status(400).json({ success: false, error: 'You cannot delete your own admin account' });
+  await dbAsync.deleteUser(req.params.id);
+  await dbAsync.remove('sessions', { user_id: req.params.id });
+  res.json({ success: true });
+});
+
+app.post('/api/admin/users/:id/reset-password', requireAuth, requireAdmin, async (req, res) => {
+  if (!passwordIsStrong(req.body.password)) return res.status(400).json({ success: false, error: 'Password must be at least 8 characters and include a letter and a number' });
+  await dbAsync.update('users', { id: req.params.id }, { $set: { password_hash: await bcrypt.hash(req.body.password, 12) } });
+  await dbAsync.remove('sessions', { user_id: req.params.id });
+  res.json({ success: true, message: 'Password reset successfully' });
+});
+
 // 2. DASHBOARD STATS
-app.get('/api/stats', async (req, res) => {
+app.get('/api/stats', requireAuth, requireAdmin, async (req, res) => {
   try {
     const [activeReports, resolvedReports, criticalEmergencies, totalCitizens, pendingApplications] = await Promise.all([
       dbAsync.count('reports', { status: { $ne: 'Resolved' } }),
       dbAsync.count('reports', { status: 'Resolved' }),
       dbAsync.count('reports', { priority: 'Critical', status: { $ne: 'Resolved' } }),
-      dbAsync.count('citizens'),
+      dbAsync.count('users', { role: 'user' }),
       dbAsync.count('applications', { status: { $ne: 'Approved' } })
     ]);
 
@@ -182,13 +203,14 @@ app.get('/api/stats', async (req, res) => {
 });
 
 // 3. REPORTS API
-app.get('/api/reports', async (req, res) => {
+app.get('/api/reports', requireAuth, async (req, res) => {
   try {
     const { status, category, citizenId } = req.query;
     const filter = {};
     if (status && status !== 'All') filter.status = status;
     if (category && category !== 'All') filter.category = category;
-    if (citizenId) filter.citizen_id = citizenId;
+    if (req.auth.user.role !== 'admin') filter.citizen_id = req.auth.user.id;
+    else if (citizenId) filter.citizen_id = citizenId;
     const reports = await dbAsync.findMany('reports', filter, { sort: { created_at: -1 } });
     res.json(reports);
   } catch (err) {
@@ -196,7 +218,7 @@ app.get('/api/reports', async (req, res) => {
   }
 });
 
-app.post('/api/reports', upload.single('photo'), async (req, res) => {
+app.post('/api/reports', requireAuth, upload.single('photo'), async (req, res) => {
   try {
     const { category, location, description, citizen_id, citizen_name } = req.body;
     const repNum = Math.floor(100 + Math.random() * 900);
@@ -205,7 +227,7 @@ app.post('/api/reports', upload.single('photo'), async (req, res) => {
     const photo_url = req.file ? `/uploads/${req.file.filename}` : null;
     const todayStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-    await dbAsync.insert('reports', { id: reportId, category: category || 'General', location: location || 'Panchayat Area', description: description || 'Issue reported', photo_url, status: 'Pending', priority, citizen_id: citizen_id || 'CIT-001', citizen_name: citizen_name || 'Rajesh Kumar', date: todayStr, created_at: new Date(), updated_at: new Date() });
+    await dbAsync.insert('reports', { id: reportId, category: category || 'General', location: location || 'Panchayat Area', description: description || 'Issue reported', photo_url, status: 'Pending', priority, citizen_id: req.auth.user.id, citizen_name: req.auth.user.name, date: todayStr, created_at: new Date(), updated_at: new Date() });
 
     const newReport = await dbAsync.findOne('reports', { id: reportId });
 
@@ -218,7 +240,7 @@ app.post('/api/reports', upload.single('photo'), async (req, res) => {
   }
 });
 
-app.put('/api/reports/:id/status', async (req, res) => {
+app.put('/api/reports/:id/status', requireAuth, requireAdmin, async (req, res) => {
   try {
     const reportId = req.params.id;
     const { status, admin_notes } = req.body;
@@ -239,23 +261,23 @@ app.put('/api/reports/:id/status', async (req, res) => {
 });
 
 // 4. SCHEME APPLICATIONS API
-app.get('/api/applications', async (req, res) => {
+app.get('/api/applications', requireAuth, async (req, res) => {
   try {
     const { citizenId } = req.query;
-    const apps = await dbAsync.findMany('applications', citizenId ? { citizen_id: citizenId } : {}, { sort: { created_at: -1 } });
+    const apps = await dbAsync.findMany('applications', req.auth.user.role === 'admin' && citizenId ? { citizen_id: citizenId } : { citizen_id: req.auth.user.id }, { sort: { created_at: -1 } });
     res.json(apps);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.post('/api/applications', async (req, res) => {
+app.post('/api/applications', requireAuth, async (req, res) => {
   try {
     const { scheme_type, citizen_id, citizen_name, details } = req.body;
     const appNum = Math.floor(1000 + Math.random() * 9000);
     const appId = `#APP-2023-${appNum}`;
 
-    await dbAsync.insert('applications', { id: appId, scheme_type: scheme_type || 'General Scheme', citizen_id: citizen_id || 'CIT-001', citizen_name: citizen_name || 'Rajesh Kumar', status: 'Submitted', progress_pct: 25, details_json: JSON.stringify(details || {}), created_at: new Date(), updated_at: new Date() });
+    await dbAsync.insert('applications', { id: appId, scheme_type: scheme_type || 'General Scheme', citizen_id: req.auth.user.id, citizen_name: req.auth.user.name, status: 'Submitted', progress_pct: 25, details_json: JSON.stringify(details || {}), created_at: new Date(), updated_at: new Date() });
 
     const newApp = await dbAsync.findOne('applications', { id: appId });
 
@@ -268,7 +290,7 @@ app.post('/api/applications', async (req, res) => {
   }
 });
 
-app.put('/api/applications/:id/status', async (req, res) => {
+app.put('/api/applications/:id/status', requireAuth, requireAdmin, async (req, res) => {
   try {
     const appId = req.params.id;
     const { status, progress_pct, admin_notes } = req.body;
@@ -290,9 +312,9 @@ app.put('/api/applications/:id/status', async (req, res) => {
 });
 
 // 5. CITIZENS DIRECTORY API
-app.get('/api/citizens', async (req, res) => {
+app.get('/api/citizens', requireAuth, requireAdmin, async (req, res) => {
   try {
-    const citizens = await dbAsync.findMany('citizens', {}, { sort: { name: 1 }, projection: { _id: 0, id: 1, name: 1, mobile: 1, village: 1, aadhaar_verified: 1, avatar_url: 1, role: 1 } });
+    const citizens = await dbAsync.findMany('users', { role: 'user' }, { sort: { name: 1 }, projection: { _id: 0, id: 1, name: 1, username: 1, email: 1, mobile: 1, village: 1, aadhaar_verified: 1, avatar_url: 1, role: 1, disabled: 1 } });
     res.json(citizens);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -300,10 +322,11 @@ app.get('/api/citizens', async (req, res) => {
 });
 
 // 6. MULTI-LINGUAL NLP DIALOG & ASSISTANT CHAT API
-app.post('/api/chat', async (req, res) => {
+app.post('/api/chat', requireAuth, async (req, res) => {
   try {
-    const { text, citizenId, language } = req.body;
-    const replyObj = await processUserQuery(text, citizenId, dbAsync, language || 'en');
+    const { text, language } = req.body;
+    const citizenId = req.auth.user.id;
+    const replyObj = await processUserQuery(text, citizenId, dbAsync, language || req.auth.user.language || 'en');
     
     // Save chat messages to MongoDB history.
     const replyText = typeof replyObj === 'string' ? replyObj : replyObj.reply;
