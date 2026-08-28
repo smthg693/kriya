@@ -172,7 +172,7 @@ app.get('/api/profile', requireAuth, (req, res) => res.json({ success: true, pro
 
 app.put('/api/profile', requireAuth, async (req, res) => {
   try {
-    const allowed = ['name', 'mobile', 'village', 'avatar_url', 'language', 'preferences'];
+    const allowed = ['name', 'mobile', 'email', 'village', 'avatar_url', 'language', 'preferences'];
     const changes = Object.fromEntries(Object.entries(req.body).filter(([key]) => allowed.includes(key)));
     await dbAsync.update('users', { id: req.auth.user.id }, { $set: changes });
     res.json({ success: true, profile: await dbAsync.findUserById(req.auth.user.id) });

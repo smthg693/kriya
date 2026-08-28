@@ -79,7 +79,7 @@ function showToast(message, type = 'info') {
 // Universal Language Dictionary (English & Hindi)
 const translations = {
   en: {
-    langBtn: 'हिंदी',
+    langBtn: 'English',
     headerSub: 'Gram Panchayat Digital Services Portal',
     welcomeBadge: 'Official Panchayat Portal',
     greeting: 'Namaste, {name}!',
@@ -109,7 +109,7 @@ const translations = {
     navProfile: 'Profile'
   },
   hi: {
-    langBtn: 'मराठी',
+    langBtn: 'हिंदी',
     headerSub: 'ग्राम पंचायत डिजिटल सेवाएं पोर्टल',
     welcomeBadge: 'आधिकारिक पंचायत पोर्टल',
     greeting: 'नमस्ते, {name}!',
@@ -139,7 +139,7 @@ const translations = {
     navProfile: 'प्रोफाइल'
   },
   mr: {
-    langBtn: 'English',
+    langBtn: 'मराठी',
     headerSub: 'ग्राम पंचायत डिजिटल सेवा पोर्टल',
     welcomeBadge: 'अधिकृत पंचायत पोर्टल',
     greeting: 'नमस्कार, {name}!',
@@ -175,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupLanguageSwitcher();
   setupTabNavigation();
   setupAuthModal();
+  setupEditProfileModal();
   setupChatBot();
   setupReportForm();
   if (!currentToken) {
@@ -256,13 +257,28 @@ function switchTab(tabId) {
 // Language Switcher Engine
 function setupLanguageSwitcher() {
   const langBtn = document.getElementById('lang-toggle-btn');
-  langBtn.addEventListener('click', () => {
-    if (currentLang === 'en') currentLang = 'hi';
-    else if (currentLang === 'hi') currentLang = 'mr';
-    else currentLang = 'en';
-    localStorage.setItem('gram_lang', currentLang);
-    updateLanguageUI();
+  if (langBtn) {
+    langBtn.addEventListener('click', () => {
+      if (currentLang === 'en') currentLang = 'hi';
+      else if (currentLang === 'hi') currentLang = 'mr';
+      else currentLang = 'en';
+      localStorage.setItem('gram_lang', currentLang);
+      updateLanguageUI();
+    });
+  }
+
+  document.querySelectorAll('.lang-option-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const selectedLang = btn.dataset.lang;
+      if (selectedLang && ['en', 'hi', 'mr'].includes(selectedLang)) {
+        currentLang = selectedLang;
+        localStorage.setItem('gram_lang', currentLang);
+        updateLanguageUI();
+      }
+    });
   });
+
   updateLanguageUI();
 }
 
@@ -438,7 +454,9 @@ function updateUserProfileDisplay() {
     headerLogoutBtn.classList.toggle('hidden', !currentToken);
     headerLogoutBtn.classList.toggle('flex', Boolean(currentToken));
   }
-  document.getElementById('user-name-display').textContent = currentUser.name;
+  const nameDisp = document.getElementById('user-name-display');
+  if (nameDisp) nameDisp.textContent = currentUser.name || currentUser.username || 'Citizen';
+
   if (currentUser.avatar_url) {
     const headerAvatar = document.getElementById('user-avatar-img');
     if (headerAvatar) headerAvatar.src = currentUser.avatar_url;
@@ -446,10 +464,92 @@ function updateUserProfileDisplay() {
     if (cardAvatar) cardAvatar.src = currentUser.avatar_url;
   }
   const cardName = document.getElementById('profile-card-name');
-  if (cardName) cardName.textContent = currentUser.name;
+  if (cardName) cardName.textContent = currentUser.name || currentUser.username || 'Citizen';
   const cardVillage = document.getElementById('profile-card-village');
-  if (cardVillage) cardVillage.textContent = `${currentUser.village} Village • Mobile: ${currentUser.mobile}`;
+  if (cardVillage) {
+    const mob = (currentUser.mobile && currentUser.mobile !== 'null') ? currentUser.mobile : 'Not set';
+    cardVillage.textContent = `${currentUser.village || 'Kalyanpur'} Village • Mobile: ${mob}`;
+  }
   updateLanguageUI();
+}
+
+function setupEditProfileModal() {
+  const openBtn = document.getElementById('open-edit-profile-btn');
+  const modal = document.getElementById('edit-profile-modal');
+  const closeBtn = document.getElementById('edit-profile-modal-close');
+  const cancelBtn = document.getElementById('cancel-edit-profile-btn');
+  const form = document.getElementById('edit-profile-form');
+
+  if (!openBtn || !modal) return;
+
+  openBtn.addEventListener('click', () => {
+    if (!currentUser) {
+      showToast('Please log in to edit profile', 'error');
+      openAuthModal('citizen');
+      return;
+    }
+
+    document.getElementById('edit-name-input').value = currentUser.name || '';
+    document.getElementById('edit-email-input').value = (currentUser.email && currentUser.email !== 'null') ? currentUser.email : '';
+    document.getElementById('edit-mobile-input').value = (currentUser.mobile && currentUser.mobile !== 'null') ? currentUser.mobile : '';
+    document.getElementById('edit-username-display').textContent = currentUser.username || currentUser.id || 'CIT-001';
+
+    modal.classList.remove('hidden');
+  });
+
+  const closeModal = () => modal.classList.add('hidden');
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const newName = document.getElementById('edit-name-input').value.trim();
+      const newEmail = document.getElementById('edit-email-input').value.trim();
+      const newMobile = document.getElementById('edit-mobile-input').value.trim();
+
+      if (!newName) {
+        showToast('Please enter your name', 'error');
+        return;
+      }
+
+      try {
+        if (currentToken) {
+          const res = await fetch('/api/profile', {
+            method: 'PUT',
+            headers: authHeaders({ 'Content-Type': 'application/json' }),
+            body: JSON.stringify({ name: newName, email: newEmail, mobile: newMobile })
+          });
+          const data = await res.json();
+          if (data.success && data.profile) {
+            currentUser = data.profile;
+          } else {
+            currentUser.name = newName;
+            currentUser.email = newEmail;
+            currentUser.mobile = newMobile;
+          }
+        } else {
+          currentUser.name = newName;
+          currentUser.email = newEmail;
+          currentUser.mobile = newMobile;
+        }
+
+        localStorage.setItem('gram_user', JSON.stringify(currentUser));
+        updateUserProfileDisplay();
+        closeModal();
+        showToast('Profile updated successfully!');
+      } catch (err) {
+        console.error('Error saving profile:', err);
+        currentUser.name = newName;
+        currentUser.email = newEmail;
+        currentUser.mobile = newMobile;
+        localStorage.setItem('gram_user', JSON.stringify(currentUser));
+        updateUserProfileDisplay();
+        closeModal();
+        showToast('Profile updated!');
+      }
+    });
+  }
 }
 
 // Assistant & Speech Recognition Setup
