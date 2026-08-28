@@ -304,7 +304,110 @@ function matchSmallTalk(input, lang) {
   return null;
 }
 
-async function processUserQuery(text, citizenId, dbAsync, preferredLang = 'en', sessionId = null) {
+const COMPLAINT_TRIGGER_REGEX = /(report|complaint|file complaint|issue|problem|broken|leak|leaking|no water|water supply|pothole|road damage|garbage|trash|waste|gutter|drain|no electricity|power cut|street light|light off|तार|खराब|तक्रार|शिकायत|लीकेज|पाणी|पानी|वीज|बिजली|रस्ता|सड़क|कचरा|नाली|लाइट)/i;
+
+function detectCategory(text) {
+  const t = (text || '').toLowerCase();
+  if (/water|leak|pipe|borewell|tank|पाणी|पानी|नल|लीकेज/i.test(t)) return 'Water Supply';
+  if (/electric|power|light|wire|pole|transformer|वीज|बिजली|लाइट|पोल/i.test(t)) return 'Electricity';
+  if (/road|pothole|asphalt|bridge|रस्ता|सड़क|गड्ढा|खड्डा/i.test(t)) return 'Roads';
+  if (/garbage|trash|waste|gutter|drain|cleanliness|कचरा|नाली|सफाई|गटार/i.test(t)) return 'Sanitation';
+  if (/street light|lamp|darkness|पथदिवे|स्ट्रीट/i.test(t)) return 'Street Lights';
+  return 'Civic Infrastructure';
+}
+
+function detectPriorityHelper(text, category) {
+  const t = (text || '').toLowerCase();
+  if (/fire|wire|spark|fallen|flood|emergency|danger|तार|खतरा|आग/i.test(t)) return 'Critical';
+  if (/leak|no water|broken|sewage|खराब|लीकेज|तक्रार/i.test(t)) return 'High';
+  if (category === 'Water Supply' || category === 'Electricity') return 'Medium';
+  return 'Low';
+}
+
+async function handleAutomatedComplaintReporting(input, citizenId, dbAsync, lang = 'en', io = null) {
+  const text = (input || '').trim();
+  const lower = text.toLowerCase();
+  
+  // If the query is just a generic prompt like "complaint" or "file issue" without details:
+  const isGenericPrompt = text.split(/\s+/).length <= 2 && /^(complaint|report|issue|takraar|shikayat|तक्रार|शिकायत)$/i.test(lower);
+  if (isGenericPrompt) {
+    return {
+      reply: lang === 'mr'
+        ? `तुम्हाला कोणती नागरी समस्या नोंदवायची आहे? कृपया संक्षिप्त माहिती सांगा (उदा. 'वॉर्ड २ मध्ये पाण्याची पाईप गळती' किंवा 'मुख्य रस्त्यावर पथदिवा बंद').`
+        : (lang === 'hi'
+          ? `आप कौन सी नागरिक समस्या रिपोर्ट करना चाहते हैं? कृपया विवरण दें (जैसे 'वार्ड 2 में पानी की पाइप लीकेज' या 'मुख्य मार्ग पर लाइट खराब')।`
+          : `What issue would you like to report? Please describe the problem (e.g., 'Water leak in Ward 2' or 'Street light broken near main road').`),
+      actions: [
+        { label: lang === 'mr' ? 'तक्रार फॉर्म उघडा' : (lang === 'hi' ? 'शिकायत फॉर्म खोलें' : 'Open Complaint Form'), tab: 'tab-report' }
+      ]
+    };
+  }
+
+  const category = detectCategory(text);
+  const priority = detectPriorityHelper(text, category);
+  const reportId = `#REP-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+  const todayStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+  // Retrieve citizen user info
+  let user = null;
+  if (dbAsync && citizenId) {
+    try {
+      user = await dbAsync.findOne('users', { id: citizenId });
+    } catch(e) {}
+  }
+  const uId = (user && user.id) ? user.id : (citizenId || 'CIT-001');
+  const uName = (user && user.name) ? user.name : 'Rajesh Kumar';
+
+  const reportData = {
+    id: reportId,
+    category,
+    location: 'Panchayat Area / Citizen Ward',
+    description: text,
+    photo_url: null,
+    status: 'Pending',
+    priority,
+    citizen_id: uId,
+    citizen_name: uName,
+    date: todayStr,
+    created_at: new Date(),
+    updated_at: new Date()
+  };
+
+  if (dbAsync) {
+    try {
+      await dbAsync.insert('reports', reportData);
+    } catch(e) {
+      console.error("Error inserting automated chat report:", e);
+    }
+  }
+
+  // Broadcast WebSockets to Admin Dashboard and Citizen in real time!
+  if (io) {
+    io.to('admins').emit('report_created', reportData);
+    io.to(`citizen:${uId}`).emit('report_created', reportData);
+  }
+
+  let replyText = '';
+  if (lang === 'mr') {
+    replyText = `🚨 <b>तक्रार आपोआप नोंदवली गेली आहे!</b>\n\n• <b>तक्रार संदर्भ:</b> <code>${reportId}</code>\n• <b>प्रवर्ग:</b> ${category}\n• <b>प्राधान्य:</b> ${priority}\n• <b>स्थिती:</b> प्रलंबित (Pending Review)\n\n<i>तुमची समस्या थेट ग्रामपंचायत सचिव व ॲडमिन डॅशबोर्डवर तात्काळ नोंदवण्यात आली आहे.</i>`;
+  } else if (lang === 'hi') {
+    replyText = `🚨 <b>आपकी शिकायत स्वचालित रूप से दर्ज हो गई है!</b>\n\n• <b>शिकायत संदर्भ:</b> <code>${reportId}</code>\n• <b>श्रेणी:</b> ${category}\n• <b>प्राथमिकता:</b> ${priority}\n• <b>स्थिति:</b> लंबित (Pending Review)\n\n<i>आपकी समस्या सीधे ग्राम पंचायत अधिकारी एवं एडमिन डैशबोर्ड पर पंजीकृत कर दी गई है।</i>`;
+  } else {
+    replyText = `🚨 <b>Complaint Ticket Filed Automatically!</b>\n\n• <b>Ticket Ref:</b> <code>${reportId}</code>\n• <b>Category:</b> ${category}\n• <b>Priority:</b> ${priority}\n• <b>Status:</b> Pending Review\n\n<i>Your issue has been automatically registered with the Gram Panchayat Secretary & Admin Dashboard in real-time.</i>`;
+  }
+
+  return {
+    reply: replyText,
+    actions: [
+      {
+        label: lang === 'mr' ? 'तक्रारीची स्थिती पहा' : (lang === 'hi' ? 'शिकायत की स्थिति देखें' : 'View Ticket Status'),
+        tab: 'tab-profile'
+      }
+    ]
+  };
+}
+
+async function processUserQuery(text, citizenId, dbAsync, preferredLang = 'en', sessionId = null, io = null) {
   const input = (text || '').trim();
 
   // Determine Language
@@ -360,6 +463,19 @@ async function processUserQuery(text, citizenId, dbAsync, preferredLang = 'en', 
     return smallTalkResponse;
   }
 
+  // Intercept Direct In-Chat Complaint Reporting
+  if (COMPLAINT_TRIGGER_REGEX.test(input)) {
+    logNLUEvent(dbAsync, {
+      text: input,
+      intent: 'COMPLAINT_AUTO',
+      confidence: 1.0,
+      final_action: 'AUTO_REPORT',
+      language: lang,
+      citizen_id: citizenId
+    });
+    return await handleAutomatedComplaintReporting(input, citizenId, dbAsync, lang, io);
+  }
+
   // Step 1: Call Python NLU Microservice
   const nluData = await parseNLU(input, sessionId);
 
@@ -381,7 +497,9 @@ async function processUserQuery(text, citizenId, dbAsync, preferredLang = 'en', 
   let result = null;
 
   // Step 3: 3-Tier Confidence Gater
-  if (nluData && confidence >= 0.75) {
+  if (intent === 'COMPLAINT') {
+    result = await handleAutomatedComplaintReporting(input, citizenId, dbAsync, lang, io);
+  } else if (nluData && confidence >= 0.75) {
     finalAction = 'EXECUTE_DIRECT';
     if (intent === 'STATUS') {
       result = await handleLiveStatusLookup(citizenId, dbAsync, lang);

@@ -367,7 +367,7 @@ app.post('/api/chat', requireAuth, async (req, res) => {
   try {
     const { text, language, session_id } = req.body;
     const citizenId = req.auth.user.id;
-    const replyObj = await processUserQuery(text, citizenId, dbAsync, language || req.auth.user.language || 'en', session_id || citizenId);
+    const replyObj = await processUserQuery(text, citizenId, dbAsync, language || req.auth.user.language || 'en', session_id || citizenId, io);
     
     // Save chat messages to MongoDB history.
     const replyText = typeof replyObj === 'string' ? replyObj : replyObj.reply;
