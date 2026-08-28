@@ -596,9 +596,9 @@ h1, h2, h3, h4, .font-headline {
   background: #ffffff !important;
   border: 1.5px solid #cbd5e1 !important;
   border-radius: 9999px !important;
-  padding: 3px 10px !important;
+  padding: 3px 12px 3px 12px !important;
   height: 38px !important;
-  max-width: 110px !important;
+  max-width: 148px !important;
   overflow: hidden !important;
   white-space: nowrap !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
