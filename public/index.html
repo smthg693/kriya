@@ -62,73 +62,86 @@
   <main class="flex-1 w-full max-w-4xl mx-auto px-4 py-6 pb-28 md:pb-12 flex flex-col gap-6">
 
     <!-- TAB 1: HOME SECTION -->
-    <section id="tab-home" class="tab-content flex flex-col gap-6 animate-fade-in">
+    <section id="tab-home" class="tab-content flex flex-col gap-5 animate-fade-in">
+
       <!-- Welcome Card Banner -->
       <div class="hero-card">
-        <div class="relative z-10">
-          <span class="hero-badge" id="home-welcome-badge">
-            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-            Official Panchayat Portal
-          </span>
-          <h2 class="font-headline text-2xl md:text-3xl font-extrabold" id="home-greeting">Namaste, Citizen!</h2>
-          <p class="text-sm md:text-base opacity-95 mt-1" id="home-subtext">How can Gram Sahayak assist you today in Gram Panchayat?</p>
+        <div class="relative z-10 flex items-center justify-between gap-4">
+          <div class="flex-1">
+            <span class="hero-badge" id="home-welcome-badge">
+              <span class="w-1.5 h-1.5 rounded-full" style="background:#6ee7b7"></span>
+              Official Panchayat Portal
+            </span>
+            <h2 class="font-headline font-extrabold" id="home-greeting">Namaste, Citizen!</h2>
+            <p class="mt-1" id="home-subtext">How can Gram Sahayak assist you today?</p>
 
-          <div class="mt-6 flex flex-wrap gap-3">
-            <button onclick="switchTab('tab-chat')" class="btn-voice">
-              <span class="material-symbols-outlined">mic</span>
-              <span id="home-btn-voice">Start Voice Chat</span>
-            </button>
-            <button onclick="switchTab('tab-report')" class="btn-report-hero">
-              <span class="material-symbols-outlined text-rose-600">report_problem</span>
-              <span id="home-btn-report">Report a Problem</span>
-            </button>
+            <div class="mt-5 flex flex-wrap gap-3">
+              <button onclick="switchTab('tab-chat')" class="btn-voice">
+                <span class="material-symbols-outlined text-[20px]">mic</span>
+                <span id="home-btn-voice">Start Voice Chat</span>
+              </button>
+              <button onclick="switchTab('tab-report')" class="btn-report-hero">
+                <span class="material-symbols-outlined text-[20px]">report_problem</span>
+                <span id="home-btn-report">Report a Problem</span>
+              </button>
+            </div>
+          </div>
+          <!-- Decorative right icon badge (hidden on very small screens) -->
+          <div class="hidden sm:flex w-20 h-20 rounded-2xl items-center justify-center shrink-0" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);">
+            <span class="material-symbols-outlined" style="font-size:44px; color:rgba(255,255,255,0.7);">account_balance</span>
           </div>
         </div>
       </div>
 
       <!-- Quick Action Grid -->
       <div>
-        <h3 class="font-headline text-lg font-bold text-slate-800 mb-3" id="home-quick-actions-title">Popular Services</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3" id="home-quick-actions-title">Popular Services</p>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
           <button onclick="switchTab('tab-services')" class="service-card">
             <div class="icon-box icon-box-emerald">
-              <span class="material-symbols-outlined text-2xl">landscape</span>
+              <span class="material-symbols-outlined text-[26px]">landscape</span>
             </div>
-            <span class="text-xs md:text-sm font-bold text-slate-800" id="cat-land">Land Records (Bhulekh)</span>
+            <span class="text-xs font-bold text-slate-700" id="cat-land">Land Records</span>
           </button>
 
           <button onclick="switchTab('tab-services')" class="service-card">
             <div class="icon-box icon-box-blue">
-              <span class="material-symbols-outlined text-2xl">account_balance_wallet</span>
+              <span class="material-symbols-outlined text-[26px]">account_balance_wallet</span>
             </div>
-            <span class="text-xs md:text-sm font-bold text-slate-800" id="cat-pension">Pension Schemes</span>
+            <span class="text-xs font-bold text-slate-700" id="cat-pension">Pension Schemes</span>
           </button>
 
           <button onclick="switchTab('tab-services')" class="service-card">
             <div class="icon-box icon-box-amber">
-              <span class="material-symbols-outlined text-2xl">description</span>
+              <span class="material-symbols-outlined text-[26px]">description</span>
             </div>
-            <span class="text-xs md:text-sm font-bold text-slate-800" id="cat-cert">Certificates</span>
+            <span class="text-xs font-bold text-slate-700" id="cat-cert">Certificates</span>
           </button>
 
           <button onclick="switchTab('tab-report')" class="service-card">
             <div class="icon-box icon-box-rose">
-              <span class="material-symbols-outlined text-2xl">report_problem</span>
+              <span class="material-symbols-outlined text-[26px]">report_problem</span>
             </div>
-            <span class="text-xs md:text-sm font-bold text-slate-800" id="cat-complaint">File Complaint</span>
+            <span class="text-xs font-bold text-slate-700" id="cat-complaint">File Complaint</span>
           </button>
         </div>
       </div>
 
       <!-- Live Announcements Banner -->
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
-        <div class="flex items-center gap-2 mb-2 text-emerald-800 font-bold text-xs tracking-wide uppercase">
-          <span class="material-symbols-outlined text-base">campaign</span>
-          <span id="announcement-title-header">Panchayat Update</span>
+      <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div class="h-1 w-full" style="background:linear-gradient(90deg,#064e3b,#059669,#34d399);"></div>
+        <div class="p-5">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="flex items-center justify-center w-7 h-7 rounded-lg" style="background:#ecfdf5;">
+              <span class="material-symbols-outlined text-emerald-700" style="font-size:16px;">campaign</span>
+            </span>
+            <span class="text-[10px] font-bold text-emerald-700 tracking-widest uppercase" id="announcement-title-header">Panchayat Update</span>
+          </div>
+          <h4 class="font-bold text-slate-900 text-sm leading-snug" id="announcement-heading">PM-Kisan Installment Update</h4>
+          <p class="text-xs text-slate-500 mt-1.5 leading-relaxed" id="announcement-body">The next installment of PM-Kisan Samman Nidhi will be credited soon. Ensure your e-KYC is updated.</p>
         </div>
-        <h4 class="font-bold text-slate-900 text-base" id="announcement-heading">PM-Kisan Installment Update</h4>
-        <p class="text-xs md:text-sm text-slate-600 mt-1 leading-relaxed" id="announcement-body">The next installment of PM-Kisan Samman Nidhi will be credited soon. Ensure your e-KYC is updated.</p>
       </div>
+
     </section>
 
     <!-- TAB 2: SERVICES DIRECTORY -->
