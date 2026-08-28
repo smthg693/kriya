@@ -1,0 +1,136 @@
+text,language,intent
+"hi",en,GREETING
+"hello",en,GREETING
+"hey there",en,GREETING
+"namaste",hi,GREETING
+"नमस्ते",hi,GREETING
+"pranam",hi,GREETING
+"who are you",en,GREETING
+"kaun ho aap",hi,GREETING
+"tell me about yourself",en,GREETING
+"how are you",en,GREETING
+"kaise ho",hi,GREETING
+"dhanyawad",hi,GREETING
+"thank you",en,GREETING
+"mera status kya hai",hi,STATUS
+"where is my application",en,STATUS
+"track my complaint",en,STATUS
+"shikayat ka kya hua",hi,STATUS
+"application status check",en,STATUS
+"meri status batao",hi,STATUS
+"kahan tak pahuche mera app",hi,STATUS
+"complaint progress",en,STATUS
+"my report status",en,STATUS
+"pm kisan paisa kab aayega",hi,PMKISAN
+"pmkisan installment date",en,PMKISAN
+"kisan Samman nidhi kist",hi,PMKISAN
+"fasal beej yojna",hi,PMKISAN
+"kisan ka paisa nahi aaya",hi,PMKISAN
+"apply for pm kisan",en,PMKISAN
+"e-kyc pm kisan",en,PMKISAN
+"kheti ke paise",hi,PMKISAN
+"solar pump yojana",hi,SOLAR
+"pm kusum solar pump subsidy",en,SOLAR
+"sauro pump lagwana hai",hi,SOLAR
+"solar irrigation pump apply",en,SOLAR
+"sinchai pump yojana",hi,SOLAR
+"solar pump for farmer",en,SOLAR
+"boring pump subsidy",hi,SOLAR
+"solar subsidy percentage",en,SOLAR
+"mgnrega job card banwana hai",hi,MGNREGA
+"nrega 100 days work",en,MGNREGA
+"jobcard registration",en,MGNREGA
+"manrega rozgar guarantee",hi,MGNREGA
+"majdoori paisa bank account",hi,MGNREGA
+"nrega payment list",en,MGNREGA
+"job card secretry",hi,MGNREGA
+"nrlm mahila samuh loan",hi,SHG
+"self help group registration",en,SHG
+"bachat samuh micro loan",hi,SHG
+"mahila samuh loan apply",hi,SHG
+"aajeevika mission samuh sakhi",hi,SHG
+"women shg interest rate",en,SHG
+"samuh loan kitna milega",hi,SHG
+"mitti ki janch kahan hoti hai",hi,SOIL
+"soil health card test",en,SOIL
+"mrida parikshan center",hi,SOIL
+"fertilizer urea dap price",en,SOIL
+"sarkari khaad ki bori rate",hi,SOIL
+"soil npk testing free",en,SOIL
+"fertilizer biometric pos",en,SOIL
+"aaj ka mausam kaisa rahega",hi,WEATHER
+"weather forecast today",en,WEATHER
+"baarish kab hogi",hi,WEATHER
+"rain prediction next 3 days",en,WEATHER
+"fasal me keeda lag gaya",hi,WEATHER
+"pest control helpline 1551",en,WEATHER
+"kisan call center weather",en,WEATHER
+"chatravriti scholarship form",hi,SCHOLARSHIP
+"student scholarship eligibility",en,SCHOLARSHIP
+"pre matric post matric bache ki padhai",hi,SCHOLARSHIP
+"school fee assistance scheme",en,SCHOLARSHIP
+"scholarship document list",en,SCHOLARSHIP
+"padhai ke liye scholarship",hi,SCHOLARSHIP
+"gram sabha baithak kab hai",hi,GRAM_SABHA
+"gram panchayat meeting schedule",en,GRAM_SABHA
+"sabha baithak date",hi,GRAM_SABHA
+"panchayat ghar decision rights",en,GRAM_SABHA
+"15 august 26 jan gram sabha",hi,GRAM_SABHA
+"panchayat meeting notice",en,GRAM_SABHA
+"gaaye bhains bima yojana",hi,PASHU
+"cattle livestock insurance 70 percent",en,PASHU
+"pashu doctor helpline 1962",hi,PASHU
+"free fmd vaccination cattle",en,PASHU
+"pashu chikitsa doorstep service",hi,PASHU
+"veterinary clinic address",en,PASHU
+"ration card me naam judwana hai",hi,RATION
+"apply new ration card bpl",en,RATION
+"raashan nahi mila kotedar",hi,RATION
+"ration card document requirement",en,RATION
+"galla ration quota check",hi,RATION
+"food grain card apply",en,RATION
+"bhulekh khatauni khasra copy",hi,BHULEKH
+"view land record online",en,BHULEKH
+"zameen kiske naam hai",hi,BHULEKH
+"lekhpal dakhil kharij report",hi,BHULEKH
+"plot ownership document",en,BHULEKH
+"khatauni ki nakal",hi,BHULEKH
+"ayushman bharat card banwana hai",hi,AYUSHMAN
+"5 lakh free medical treatment card",en,AYUSHMAN
+"hospital ilaj ayushman card",hi,AYUSHMAN
+"csc ayushman card apply",en,AYUSHMAN
+"ayushman list check",en,AYUSHMAN
+"aay niwas jati praman patra",hi,CERTIFICATE
+"income domicile caste certificate apply",en,CERTIFICATE
+"birth certificate panchayat",en,CERTIFICATE
+"praman patra documents required",hi,CERTIFICATE
+"panchayat csc certificate",en,CERTIFICATE
+"vriddha pension yojana form",hi,PENSION
+"old age widow pension apply",en,PENSION
+"60 saal pension eligibility",hi,PENSION
+"pencion passbook aadhaar link",hi,PENSION
+"pension status check",en,PENSION
+"pm awas ghar ka paisa kab milega",hi,AWAS
+"pmay rural housing scheme 120000",en,AWAS
+"makan banane ka kist",hi,AWAS
+"panchayat awas list",hi,AWAS
+"pucca house subsidy",en,AWAS
+"sadak pe andhera hai streetlight kharab",hi,COMPLAINT
+"water supply problem pipe broken",en,COMPLAINT
+"paani nahi aa raha complaint",hi,COMPLAINT
+"garbage drain blocked electricity fault",en,COMPLAINT
+"bijli khamba shikayat",hi,COMPLAINT
+"road pothole file complaint",en,COMPLAINT
+"kachra nahi utha",hi,COMPLAINT
+"स्ट्रीट लाइट संबंधी शिकायत दर्ज करनी है",hi,COMPLAINT
+"स्ट्रीट लाइट संबंधी तक्रार दर्ज करनी है",hi,COMPLAINT
+"लाइट खराब है शिकायत दर्ज करनी है",hi,COMPLAINT
+"सड़क पर गड्ढा है तक्रार नोंदवा",hi,COMPLAINT
+"पानी का पाइप टूट गया है शिकायत करना है",hi,COMPLAINT
+"कचरा नहीं उठ रहा है शिकायत लिखो",hi,COMPLAINT
+"बिजली का खंभा गिर गया है तक्रार",hi,COMPLAINT
+"sarpanch pradhan sachiv mobile number",hi,HELPLINE
+"lekhpal contact number",en,HELPLINE
+"emergency helpline 112 108 1551",hi,HELPLINE
+"panchayat secretary helpline",en,HELPLINE
+"gram pradhan contact details",en,HELPLINE

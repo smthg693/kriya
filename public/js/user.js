@@ -80,10 +80,10 @@ function showToast(message, type = 'info') {
 const translations = {
   en: {
     langBtn: 'हिंदी',
-    headerSub: 'Gram Panchayat Services • yewlewadi',
+    headerSub: 'Gram Panchayat Digital Services Portal',
     welcomeBadge: 'Official Panchayat Portal',
-    greeting: 'Namaste, {name}! 🙏',
-    subtext: 'How can Gram Sahayak assist you today in yewlewadi village?',
+    greeting: 'Namaste, {name}!',
+    subtext: 'How can Gram Sahayak assist you today in Gram Panchayat?',
     btnVoice: 'Start Voice Chat',
     btnReport: 'Report a Problem',
     quickActionsTitle: 'Popular Services',
@@ -99,8 +99,8 @@ const translations = {
     svcGroup1: 'Personal Documents',
     svcGroup2: 'Agriculture & Land',
     svcGroup3: 'Social Welfare & Pensions',
-    chatIntro: 'Namaste! I am Gram Sahayak, your digital assistant for yewlewadi village. How can I help you today? You can type below or tap the microphone to speak!',
-    chatPlaceholder: 'Type your question or speak in Hindi/English...',
+    chatIntro: 'Namaste! I am Gram Sahayak, your digital assistant for Gram Panchayat. How can I help you today? You can type below or tap the microphone to speak!',
+    chatPlaceholder: 'Type your question or speak in English/Hindi/Marathi...',
     reportTitle: 'Report a Problem in Village',
     reportSubtitle: 'Submit civic complaints (water, electricity, roads) directly to the Gram Panchayat Officer.',
     navHome: 'Home',
@@ -109,11 +109,11 @@ const translations = {
     navProfile: 'Profile'
   },
   hi: {
-    langBtn: 'English',
-    headerSub: 'ग्राम पंचायत सेवाएं • कल्याणपुर',
+    langBtn: 'मराठी',
+    headerSub: 'ग्राम पंचायत डिजिटल सेवाएं पोर्टल',
     welcomeBadge: 'आधिकारिक पंचायत पोर्टल',
-    greeting: 'नमस्ते, {name}! 🙏',
-    subtext: 'आज ग्राम सहायक कल्याणपुर गांव में आपकी क्या सहायता कर सकता है?',
+    greeting: 'नमस्ते, {name}!',
+    subtext: 'आज ग्राम सहायक ग्राम पंचायत में आपकी क्या सहायता कर सकता है?',
     btnVoice: 'वॉयस चैट शुरू करें',
     btnReport: 'समस्या रिपोर्ट करें',
     quickActionsTitle: 'लोकप्रिय सेवाएं',
@@ -129,7 +129,7 @@ const translations = {
     svcGroup1: 'व्यक्तिगत दस्तावेज',
     svcGroup2: 'कृषि और भूमि',
     svcGroup3: 'समाज कल्याण एवं पेंशन',
-    chatIntro: 'नमस्ते! मैं ग्राम सहायक हूँ, कल्याणपुर गाँव के लिए आपका डिजिटल सहायक। मैं आज आपकी क्या सहायता कर सकता हूँ? नीचे टाइप करें या बोलने के लिए माइक दबाएँ!',
+    chatIntro: 'नमस्ते! मैं ग्राम सहायक हूँ, आपकी ग्राम पंचायत का डिजिटल सहायक। मैं आज आपकी क्या सहायता कर सकता हूँ? नीचे टाइप करें या बोलने के लिए माइक दबाएँ!',
     chatPlaceholder: 'अपना प्रश्न टाइप करें या हिंदी/अंग्रेजी में बोलें...',
     reportTitle: 'गांव में समस्या दर्ज करें',
     reportSubtitle: 'पानी, बिजली, सड़क की शिकायतें सीधे ग्राम पंचायत अधिकारी को भेजें।',
@@ -137,6 +137,36 @@ const translations = {
     navServices: 'सेवाएं',
     navReport: 'रिपोर्ट',
     navProfile: 'प्रोफाइल'
+  },
+  mr: {
+    langBtn: 'English',
+    headerSub: 'ग्राम पंचायत डिजिटल सेवा पोर्टल',
+    welcomeBadge: 'अधिकृत पंचायत पोर्टल',
+    greeting: 'नमस्कार, {name}!',
+    subtext: 'आज ग्राम सहायक ग्राम पंचायतीमध्ये तुमची कशी मदत करू शकतो?',
+    btnVoice: 'व्हॉइस चॅट सुरू करा',
+    btnReport: 'तक्रार नोंदवा',
+    quickActionsTitle: 'लोकप्रिय सेवा',
+    catLand: 'जमीन नोंदी (भूलेख)',
+    catPension: 'पेन्शन योजना',
+    catCert: 'प्रमाणपत्रे',
+    catComplaint: 'तक्रार नोंदवा',
+    annTitleHeader: 'पंचायत अपडेट',
+    annHeading: 'पीएम-किसान हप्ता अपडेट',
+    annBody: 'पीएम-किसान सन्मान निधीचा पुढील हप्ता लवकरच जमा होईल. तुमची e-KYC अपडेट असल्याचे सुनिश्चित करा.',
+    svcTitle: 'सेवा निर्देशिका',
+    svcSubtitle: 'ग्रामीण सेवा आणि केंद्रीय योजनांसाठी अर्ज करा.',
+    svcGroup1: 'वैयक्तिक कागदपत्रे',
+    svcGroup2: 'शेती आणि जमीन',
+    svcGroup3: 'समाज कल्याण आणि पेन्शन',
+    chatIntro: 'नमस्कार! मी ग्राम सहायक आहे, तुमचा ग्राम पंचायतीचा डिजिटल साहाय्यक. आज मी तुम्हाला कशी मदत करू शकतो? खाली टाईप करा किंवा बोलण्यासाठी माईक दाबा!',
+    chatPlaceholder: 'तुमचा प्रश्न टाईप करा किंवा मराठी/हिंदी/इंग्रजीत बोला...',
+    reportTitle: 'गावातील समस्या नोंदवा',
+    reportSubtitle: 'पाणी, वीज, रस्त्यांच्या तक्रारी थेट ग्राम पंचायत अधिकाऱ्याकडे पाठवा.',
+    navHome: 'मुख्यपृष्ठ',
+    navServices: 'सेवा',
+    navReport: 'तक्रार',
+    navProfile: 'प्रोफाईल'
   }
 };
 
@@ -145,12 +175,12 @@ document.addEventListener('DOMContentLoaded', () => {
   setupLanguageSwitcher();
   setupTabNavigation();
   setupAuthModal();
+  setupChatBot();
+  setupReportForm();
   if (!currentToken) {
     document.getElementById('auth-modal').classList.remove('hidden');
     return;
   }
-  setupChatBot();
-  setupReportForm();
   loadCitizenData();
   checkAuthSession();
 
@@ -227,7 +257,9 @@ function switchTab(tabId) {
 function setupLanguageSwitcher() {
   const langBtn = document.getElementById('lang-toggle-btn');
   langBtn.addEventListener('click', () => {
-    currentLang = currentLang === 'en' ? 'hi' : 'en';
+    if (currentLang === 'en') currentLang = 'hi';
+    else if (currentLang === 'hi') currentLang = 'mr';
+    else currentLang = 'en';
     localStorage.setItem('gram_lang', currentLang);
     updateLanguageUI();
   });
@@ -290,32 +322,38 @@ function setupAuthModal() {
   closeBtn.addEventListener('click', () => { if (currentToken) modal.classList.add('hidden'); });
 
   // Quick Citizen Login
-  document.getElementById('quick-citizen-login').addEventListener('click', async () => {
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ loginId: '9876543210', password: 'user123', role: 'citizen' })
-      });
-      const data = await res.json();
-      if (data.success && data.user) {
-        currentUser = data.user;
-        currentToken = data.token;
-        localStorage.setItem('gram_user', JSON.stringify(currentUser));
-        localStorage.setItem('gram_token', currentToken);
-        updateUserProfileDisplay();
-        modal.classList.add('hidden');
-        window.location.reload();
+  const quickCitizenBtn = document.getElementById('quick-citizen-login');
+  if (quickCitizenBtn) {
+    quickCitizenBtn.addEventListener('click', async () => {
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ loginId: '9876543210', password: 'user123', role: 'citizen' })
+        });
+        const data = await res.json();
+        if (data.success && data.user) {
+          currentUser = data.user;
+          currentToken = data.token;
+          localStorage.setItem('gram_user', JSON.stringify(currentUser));
+          localStorage.setItem('gram_token', currentToken);
+          updateUserProfileDisplay();
+          modal.classList.add('hidden');
+          window.location.reload();
+        }
+      } catch (e) {
+        showToast('Quick login failed.', 'error');
       }
-    } catch (e) {
-      showToast('Quick login failed.', 'error');
-    }
-  });
+    });
+  }
 
   // Quick Admin Login
-  document.getElementById('quick-admin-login').addEventListener('click', () => {
-    window.location.href = '/admin.html';
-  });
+  const quickAdminBtn = document.getElementById('quick-admin-login');
+  if (quickAdminBtn) {
+    quickAdminBtn.addEventListener('click', () => {
+      window.location.href = '/admin.html';
+    });
+  }
 
   // Standard Form Submit
   document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -438,7 +476,6 @@ function setupChatBot() {
         const replyText = typeof data.reply === 'string' ? data.reply : data.reply.reply;
         const actions = typeof data.reply === 'object' ? data.reply.actions : (data.actions || []);
         appendChatMessage('assistant', replyText, actions);
-        speakText(replyText.replace(/<[^>]*>?/gm, ''));
       }
     } catch (err) {
       appendChatMessage('assistant', 'Sorry, I am having trouble connecting right now. Please try again.');
@@ -450,10 +487,10 @@ function setupChatBot() {
   if (SpeechRecognition) {
     const recognition = new SpeechRecognition();
     recognition.continuous = false;
-    recognition.lang = currentLang === 'hi' ? 'hi-IN' : 'en-US';
+    recognition.lang = currentLang === 'hi' ? 'hi-IN' : (currentLang === 'mr' ? 'mr-IN' : 'en-US');
 
     micBtn.addEventListener('click', () => {
-      recognition.lang = currentLang === 'hi' ? 'hi-IN' : 'en-US';
+      recognition.lang = currentLang === 'hi' ? 'hi-IN' : (currentLang === 'mr' ? 'mr-IN' : 'en-US');
       recognition.start();
       micBtn.classList.add('pulse-mic');
       showToast('Listening... Speak now into your microphone.');
@@ -492,10 +529,10 @@ function appendChatMessage(sender, text, actions = []) {
     const safeText = escapeHTML(text);
     msgDiv.className = 'flex gap-3 max-w-[85%] self-end flex-row-reverse';
     msgDiv.innerHTML = `
-      <div class="w-8 h-8 rounded-full bg-secondary-container text-white flex items-center justify-center shrink-0">
+      <div class="w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center shrink-0 shadow-sm">
         <span class="material-symbols-outlined text-sm">person</span>
       </div>
-      <div class="bg-primary text-white p-4 rounded-2xl rounded-tr-sm text-sm shadow-sm">
+      <div class="bg-emerald-800 text-white p-4 rounded-2xl rounded-tr-sm text-sm shadow-sm">
         <p>${safeText}</p>
       </div>
     `;
@@ -503,21 +540,28 @@ function appendChatMessage(sender, text, actions = []) {
     const formattedText = formatRichText(text);
     let actionsHtml = '';
     if (actions && actions.length > 0) {
-      actionsHtml = `<div class="mt-3 pt-2 border-t border-gray-100 flex flex-wrap gap-2">` +
+      actionsHtml = `<div class="mt-3 pt-2 border-t border-slate-100 flex flex-wrap gap-2">` +
         actions.map(act => `
-          <button onclick="handleActionChip('${act.tab}', '${act.category || act.scheme || ''}')" class="px-3 py-1.5 text-xs font-semibold rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all shadow-sm">
+          <button onclick="handleActionChip('${act.tab}', '${act.category || act.scheme || ''}')" class="px-3 py-1.5 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-800 hover:text-white transition-all shadow-sm">
             ${escapeHTML(act.label)} ➔
           </button>
         `).join('') + `</div>`;
     }
 
     msgDiv.className = 'flex gap-3 max-w-[85%]';
+    const plainMsgText = text.replace(/<[^>]*>?/gm, '').replace(/[*#_]/g, '');
     msgDiv.innerHTML = `
-      <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shrink-0">
+      <div class="w-8 h-8 rounded-full bg-emerald-800 text-white flex items-center justify-center shrink-0 shadow-sm">
         <span class="material-symbols-outlined text-sm">support_agent</span>
       </div>
-      <div class="bg-white border border-outline-variant p-4 rounded-2xl rounded-tl-sm text-sm text-gray-800 shadow-sm">
-        <p class="font-semibold text-primary text-xs mb-1">Gram Sahayak</p>
+      <div class="bg-white border border-slate-200 p-4 rounded-2xl rounded-tl-sm text-sm text-slate-800 shadow-sm relative group">
+        <div class="flex items-center justify-between gap-2 mb-1">
+          <p class="font-semibold text-emerald-800 text-xs">Gram Sahayak</p>
+          <button onclick="speakText(this.getAttribute('data-text'))" data-text="${escapeHTML(plainMsgText)}" class="p-1 rounded-full hover:bg-slate-100 text-slate-500 hover:text-emerald-800 transition-colors inline-flex items-center gap-1 text-[11px]" title="Listen / सुनें">
+            <span class="material-symbols-outlined text-base">volume_up</span>
+            <span class="font-medium">${currentLang === 'hi' ? 'सुनें' : 'Listen'}</span>
+          </button>
+        </div>
         <div class="leading-relaxed">${formattedText}</div>
         ${actionsHtml}
       </div>
@@ -529,21 +573,51 @@ function appendChatMessage(sender, text, actions = []) {
 
 function handleActionChip(tabId, param) {
   switchTab(tabId);
-  if (param && tabId === 'tab-report') {
-    const radio = document.querySelector(`input[name="issue_category"][value="${param}"]`);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (tabId === 'tab-report') {
+    let cat = 'Electricity';
+    if (param) {
+      if (/light|electric|bijli/i.test(param)) cat = 'Electricity';
+      else if (/water|paani|jal/i.test(param)) cat = 'Water Supply';
+      else if (/road|sadak|gaddha/i.test(param)) cat = 'Roads';
+      else if (/sanitation|kachra|drain/i.test(param)) cat = 'Sanitation';
+      else cat = param;
+    }
+    const radio = document.querySelector(`input[name="issue_category"][value="${cat}"]`);
     if (radio) radio.checked = true;
-    showToast(`Pre-selected complaint category: ${param}`);
+    showToast(`Opening complaint form (${cat})`);
   } else if (param && tabId === 'tab-services') {
     applyScheme(param);
   }
 }
 
+let activeAudioPlayer = null;
+
 function speakText(text) {
-  if ('speechSynthesis' in window) {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = currentLang === 'hi' ? 'hi-IN' : 'en-US';
-    window.speechSynthesis.speak(utterance);
+  if (!text || !text.trim()) return;
+  const clean = text.replace(/<[^>]*>?/gm, '').replace(/[•#*_`]/g, ' ').trim();
+
+  // Cancel any active audio playback
+  if (activeAudioPlayer) {
+    activeAudioPlayer.pause();
+    activeAudioPlayer = null;
   }
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+
+  // Determine speech language
+  const hasDevanagari = /[\u0900-\u097F]/.test(clean);
+  const speechLang = hasDevanagari ? 'hi' : (currentLang === 'hi' ? 'hi' : 'en');
+
+  // Single clean MP3 stream from our gTTS service
+  const audioUrl = `/api/tts?text=${encodeURIComponent(clean)}&lang=${speechLang}`;
+  const audio = new Audio(audioUrl);
+  activeAudioPlayer = audio;
+
+  audio.play().catch(err => {
+    console.error("Audio playback error:", err);
+  });
 }
 
 // Report A Problem Form Logic
@@ -585,6 +659,12 @@ function setupReportForm() {
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (!currentUser || !currentUser.id) {
+      document.getElementById('auth-modal').classList.remove('hidden');
+      showToast('Please sign in to submit your civic complaint.', 'error');
+      return;
+    }
+
     const category = document.querySelector('input[name="issue_category"]:checked').value;
     const location = document.getElementById('report-location-input').value;
     const description = descInput.value;
@@ -606,11 +686,11 @@ function setupReportForm() {
       });
       const data = await res.json();
       if (data.success) {
-        showToast(`🎉 Complaint ${data.report.id} submitted! Priority: ${data.report.priority}`);
+        showToast(`Complaint ${data.report.id} submitted! Priority: ${data.report.priority}`);
         form.reset();
         switchTab('tab-profile');
       } else {
-        showToast('Failed to submit complaint.', 'error');
+        showToast(data.error || 'Failed to submit complaint.', 'error');
       }
     } catch (err) {
       showToast('Error submitting complaint.', 'error');
@@ -691,10 +771,36 @@ async function applyScheme(schemeName) {
     });
     const data = await res.json();
     if (data.success) {
-      showToast(`🎉 Application for ${schemeName} submitted! Track in Profile.`);
+      showToast(`Application for ${schemeName} submitted! Track status in Profile.`);
       switchTab('tab-profile');
     }
   } catch (err) {
     showToast('Failed to submit application.', 'error');
   }
+}
+
+function switchTab(tabId) {
+  const tabs = document.querySelectorAll('.tab-content');
+  tabs.forEach(tab => {
+    if (tab.id === tabId) {
+      tab.classList.remove('hidden');
+      tab.classList.add('flex');
+    } else {
+      tab.classList.add('hidden');
+      tab.classList.remove('flex');
+    }
+  });
+
+  const navButtons = document.querySelectorAll('.nav-btn');
+  navButtons.forEach(btn => {
+    const isTarget = btn.id === `nav-btn-${tabId.replace('tab-', '')}`;
+    if (btn.id === 'nav-btn-chat') return;
+    if (isTarget) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }

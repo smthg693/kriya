@@ -1,0 +1,7 @@
+node_modules
+.git
+.env
+*.db
+.DS_Store
+__pycache__
+nlu_service/__pycache__

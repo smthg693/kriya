@@ -6,8 +6,9 @@
   <title>Gram Sahayak - Gram Panchayat Rural Portal</title>
   
   <!-- Material Symbols & Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" />
   
   <!-- Local Tailwind build and custom styles -->
   <link rel="stylesheet" href="/css/tailwind.generated.css"/>
@@ -23,39 +24,29 @@
   <div id="toast-container"></div>
 
   <!-- Top App Header -->
-  <header class="bg-surface border-b border-outline-variant flex justify-between items-center px-4 h-16 w-full z-40 sticky top-0 shadow-sm backdrop-blur-md bg-opacity-95">
+  <header class="app-header">
     <div class="flex items-center gap-3">
-      <div class="h-10 w-10 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-sm">
+      <div class="brand-icon">
         <span class="material-symbols-outlined text-[24px]">agriculture</span>
       </div>
       <div>
-        <h1 class="font-headline text-lg md:text-xl font-bold text-primary leading-tight">Gram Sahayak</h1>
-        <p class="text-xs text-gray-500 font-medium" id="header-subtitle">Gram Panchayat Services • Kalyanpur</p>
+        <h1 class="font-headline text-lg md:text-xl font-bold text-slate-900 leading-tight">Gram Sahayak</h1>
+        <p class="text-xs text-slate-500 font-medium" id="header-subtitle">Gram Panchayat Services Portal</p>
       </div>
     </div>
 
     <div class="flex items-center gap-3">
       <!-- Language Switcher Button -->
-      <button id="lang-toggle-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container border border-outline-variant text-sm font-semibold text-primary hover:bg-primary hover:text-white transition-all shadow-sm">
-        <span class="material-symbols-outlined text-[18px]">translate</span>
+      <button id="lang-toggle-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-bold text-slate-800 hover:bg-slate-200 transition-all shadow-sm">
+        <span class="material-symbols-outlined text-[16px]">translate</span>
         <span id="lang-label">हिंदी</span>
       </button>
 
       <!-- User Profile / Login Avatar Button -->
-      <button id="auth-profile-btn" class="flex items-center gap-2 p-1 rounded-full border border-outline-variant hover:bg-surface-container transition-all active:scale-95">
-        <img id="user-avatar-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7A5WlZ1Ip5Egmg5OLkYg8R0esTwZEhlIO6xxaMwzP4_HWsTPfT_SQirVknfQNyjoupdGAQLlLGs-0vhtb-BNptIPMiAdY9J93chpFErB8BCDpTaeu4kPGGqS6V6f2Dq1FsS5YyFdlnoTV0vAACNMC250RK7-gtSvT8d_w5oiLCpqNX3eTygKTuohPgWYtvrjJYyLGdWdsRmewQkI63TNYTBWFbni2TqTCvOOWtcOv1lywOpN9DNv4uQ" class="w-8 h-8 rounded-full object-cover"/>
-        <span id="user-name-display" class="hidden md:inline text-xs font-semibold px-1">Sign in</span>
+      <button id="auth-profile-btn" class="flex items-center gap-2 p-1 pr-3 rounded-full border border-slate-200 hover:bg-slate-100 transition-all bg-white shadow-sm">
+        <img id="user-avatar-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7A5WlZ1Ip5Egmg5OLkYg8R0esTwZEhlIO6xxaMwzP4_HWsTPfT_SQirVknfQNyjoupdGAQLlLGs-0vhtb-BNptIPMiAdY9J93chpFErB8BCDpTaeu4kPGGqS6V6f2Dq1FsS5YyFdlnoTV0vAACNMC250RK7-gtSvT8d_w5oiLCpqNX3eTygKTuohPgWYtvrjJYyLGdWdsRmewQkI63TNYTBWFbni2TqTCvOOWtcOv1lywOpN9DNv4uQ" />
+        <span id="user-name-display" class="hidden md:inline text-xs font-bold text-slate-700">Sign in</span>
       </button>
-      <button id="header-signout-btn" class="hidden items-center gap-1 px-3 py-2 rounded-full border border-red-200 text-error text-xs font-bold hover:bg-red-50 transition-colors">
-        <span class="material-symbols-outlined text-base">logout</span>
-        <span>Sign out</span>
-      </button>
-
-      <!-- Admin Portal Quick Switch Link -->
-      <a href="/admin.html" class="hidden md:flex items-center gap-1 px-3 py-1.5 rounded-full bg-secondary-container text-white text-xs font-bold hover:bg-secondary transition-all shadow-sm">
-        <span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>
-        <span>Admin Portal</span>
-      </a>
     </div>
   </header>
 
@@ -63,21 +54,24 @@
   <main class="flex-1 w-full max-w-4xl mx-auto px-4 py-6 pb-28 md:pb-12 flex flex-col gap-6">
 
     <!-- TAB 1: HOME SECTION -->
-    <section id="tab-home" class="tab-content flex flex-col gap-6">
+    <section id="tab-home" class="tab-content flex flex-col gap-6 animate-fade-in">
       <!-- Welcome Card Banner -->
-      <div class="bg-gradient-to-r from-primary to-primary-container text-white rounded-2xl p-6 shadow-md relative overflow-hidden">
+      <div class="hero-card">
         <div class="relative z-10">
-          <span class="inline-block bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full mb-3 backdrop-blur-sm" id="home-welcome-badge">Official Panchayat Portal</span>
-          <h2 class="font-headline text-2xl md:text-3xl font-bold" id="home-greeting">Namaste, Citizen! 🙏</h2>
-          <p class="text-sm md:text-base opacity-90 mt-1" id="home-subtext">How can Gram Sahayak assist you today in Kalyanpur village?</p>
+          <span class="hero-badge" id="home-welcome-badge">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            Official Panchayat Portal
+          </span>
+          <h2 class="font-headline text-2xl md:text-3xl font-extrabold" id="home-greeting">Namaste, Citizen!</h2>
+          <p class="text-sm md:text-base opacity-95 mt-1" id="home-subtext">How can Gram Sahayak assist you today in Gram Panchayat?</p>
 
-          <div class="mt-5 flex flex-wrap gap-3">
-            <button onclick="switchTab('tab-chat')" class="bg-secondary-container text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md hover:bg-secondary transition-all flex items-center gap-2 active:scale-95">
+          <div class="mt-6 flex flex-wrap gap-3">
+            <button onclick="switchTab('tab-chat')" class="btn-voice">
               <span class="material-symbols-outlined">mic</span>
               <span id="home-btn-voice">Start Voice Chat</span>
             </button>
-            <button onclick="switchTab('tab-report')" class="bg-white text-primary px-5 py-2.5 rounded-xl font-bold text-sm shadow-md hover:bg-gray-100 transition-all flex items-center gap-2 active:scale-95">
-              <span class="material-symbols-outlined text-error">report_problem</span>
+            <button onclick="switchTab('tab-report')" class="btn-report-hero">
+              <span class="material-symbols-outlined text-rose-600">report_problem</span>
               <span id="home-btn-report">Report a Problem</span>
             </button>
           </div>
@@ -86,46 +80,46 @@
 
       <!-- Quick Action Grid -->
       <div>
-        <h3 class="font-headline text-lg font-bold text-gray-800 mb-3" id="home-quick-actions-title">Popular Services</h3>
+        <h3 class="font-headline text-lg font-bold text-slate-800 mb-3" id="home-quick-actions-title">Popular Services</h3>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button onclick="switchTab('tab-services')" class="bg-white p-5 rounded-2xl border border-outline-variant shadow-sm hover:shadow-md transition-all flex flex-col items-center gap-3 text-center group active:scale-95">
-            <div class="w-12 h-12 rounded-full bg-primary-container/10 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
+          <button onclick="switchTab('tab-services')" class="service-card">
+            <div class="icon-box icon-box-emerald">
               <span class="material-symbols-outlined text-2xl">landscape</span>
             </div>
-            <span class="text-xs md:text-sm font-semibold text-gray-800" id="cat-land">Land Records (Bhulekh)</span>
+            <span class="text-xs md:text-sm font-bold text-slate-800" id="cat-land">Land Records (Bhulekh)</span>
           </button>
 
-          <button onclick="switchTab('tab-services')" class="bg-white p-5 rounded-2xl border border-outline-variant shadow-sm hover:shadow-md transition-all flex flex-col items-center gap-3 text-center group active:scale-95">
-            <div class="w-12 h-12 rounded-full bg-tertiary-container/10 text-tertiary flex items-center justify-center group-hover:scale-110 transition-transform">
+          <button onclick="switchTab('tab-services')" class="service-card">
+            <div class="icon-box icon-box-blue">
               <span class="material-symbols-outlined text-2xl">account_balance_wallet</span>
             </div>
-            <span class="text-xs md:text-sm font-semibold text-gray-800" id="cat-pension">Pension Schemes</span>
+            <span class="text-xs md:text-sm font-bold text-slate-800" id="cat-pension">Pension Schemes</span>
           </button>
 
-          <button onclick="switchTab('tab-services')" class="bg-white p-5 rounded-2xl border border-outline-variant shadow-sm hover:shadow-md transition-all flex flex-col items-center gap-3 text-center group active:scale-95">
-            <div class="w-12 h-12 rounded-full bg-secondary-container/10 text-secondary flex items-center justify-center group-hover:scale-110 transition-transform">
+          <button onclick="switchTab('tab-services')" class="service-card">
+            <div class="icon-box icon-box-amber">
               <span class="material-symbols-outlined text-2xl">description</span>
             </div>
-            <span class="text-xs md:text-sm font-semibold text-gray-800" id="cat-cert">Certificates</span>
+            <span class="text-xs md:text-sm font-bold text-slate-800" id="cat-cert">Certificates</span>
           </button>
 
-          <button onclick="switchTab('tab-report')" class="bg-white p-5 rounded-2xl border border-outline-variant shadow-sm hover:shadow-md transition-all flex flex-col items-center gap-3 text-center group active:scale-95">
-            <div class="w-12 h-12 rounded-full bg-error-container/50 text-error flex items-center justify-center group-hover:scale-110 transition-transform">
+          <button onclick="switchTab('tab-report')" class="service-card">
+            <div class="icon-box icon-box-rose">
               <span class="material-symbols-outlined text-2xl">report_problem</span>
             </div>
-            <span class="text-xs md:text-sm font-semibold text-gray-800" id="cat-complaint">File Complaint</span>
+            <span class="text-xs md:text-sm font-bold text-slate-800" id="cat-complaint">File Complaint</span>
           </button>
         </div>
       </div>
 
       <!-- Live Announcements Banner -->
-      <div class="bg-white rounded-2xl border border-outline-variant p-5 shadow-sm">
-        <div class="flex items-center gap-2 mb-2 text-primary font-bold text-sm">
-          <span class="material-symbols-outlined">campaign</span>
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+        <div class="flex items-center gap-2 mb-2 text-emerald-800 font-bold text-xs tracking-wide uppercase">
+          <span class="material-symbols-outlined text-base">campaign</span>
           <span id="announcement-title-header">Panchayat Update</span>
         </div>
-        <h4 class="font-bold text-gray-900" id="announcement-heading">PM-Kisan Installment Update</h4>
-        <p class="text-xs md:text-sm text-gray-600 mt-1" id="announcement-body">The next installment of PM-Kisan Samman Nidhi will be credited soon. Ensure your e-KYC is updated.</p>
+        <h4 class="font-bold text-slate-900 text-base" id="announcement-heading">PM-Kisan Installment Update</h4>
+        <p class="text-xs md:text-sm text-slate-600 mt-1 leading-relaxed" id="announcement-body">The next installment of PM-Kisan Samman Nidhi will be credited soon. Ensure your e-KYC is updated.</p>
       </div>
     </section>
 
@@ -213,41 +207,45 @@
     </section>
 
     <!-- TAB 3: SAHAYAK AI VOICE & TEXT CHATBOT -->
-    <section id="tab-chat" class="tab-content hidden flex flex-col gap-0 pb-24">
-
-      <!-- Messages Stream Area -->
-      <div id="chat-messages-container" class="flex-1 p-4 overflow-y-auto flex flex-col gap-4 bg-gray-50">
-        <!-- Initial Assistant Greeting -->
-        <div class="flex gap-3 max-w-[85%]">
-          <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shrink-0">
-            <span class="material-symbols-outlined text-sm">support_agent</span>
-          </div>
-          <div class="bg-white border border-outline-variant p-4 rounded-2xl rounded-tl-sm text-sm text-gray-800 shadow-sm">
-            <p class="font-semibold text-primary text-xs mb-1">Gram Sahayak</p>
-            <p id="chat-intro-text">Namaste! I am Gram Sahayak, your digital assistant. How can I help you today?</p>
+    <section id="tab-chat" class="tab-content hidden flex flex-col">
+      <div class="chat-wrapper">
+        <!-- Messages Stream Area -->
+        <div id="chat-messages-container" class="chat-messages">
+          <!-- Initial Assistant Greeting -->
+          <div class="flex gap-3 max-w-[85%]">
+            <div class="w-8 h-8 rounded-full bg-emerald-800 text-white flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-sm">support_agent</span>
+            </div>
+            <div class="bg-white border border-slate-200 p-4 rounded-2xl rounded-tl-sm text-sm text-slate-800 shadow-sm">
+              <p class="font-semibold text-emerald-800 text-xs mb-1">Gram Sahayak</p>
+              <p id="chat-intro-text">Namaste! I am Gram Sahayak, your digital assistant for Gram Panchayat. How can I help you today?</p>
+            </div>
           </div>
         </div>
+
+        <!-- Sticky Footer Toolbar -->
+        <div class="chat-footer">
+          <!-- Suggestion Chips -->
+          <div class="px-4 py-2 bg-slate-50 border-b border-slate-200 flex gap-2 overflow-x-auto text-xs">
+            <button onclick="sendQuickQuery('How do I apply for Ration Card?')" class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-emerald-800 font-bold shrink-0 hover:bg-emerald-800 hover:text-white transition-colors shadow-sm">Ration Card Docs?</button>
+            <button onclick="sendQuickQuery('What is the status of PM-Kisan?')" class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-emerald-800 font-bold shrink-0 hover:bg-emerald-800 hover:text-white transition-colors shadow-sm">PM-Kisan Update</button>
+            <button onclick="sendQuickQuery('How do I report broken street light?')" class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-emerald-800 font-bold shrink-0 hover:bg-emerald-800 hover:text-white transition-colors shadow-sm">Report Broken Light</button>
+          </div>
+
+          <!-- Input Toolbar -->
+          <form id="chat-form" class="p-3 bg-white flex items-center gap-2">
+            <button type="button" id="mic-btn" class="chat-mic-btn" title="Tap to Speak">
+              <span class="material-symbols-outlined">mic</span>
+            </button>
+
+            <input type="text" id="chat-input" placeholder="Type your question or speak in Hindi/English..." class="chat-input-field"/>
+
+            <button type="submit" class="chat-send-btn" title="Send Message">
+              <span class="material-symbols-outlined">send</span>
+            </button>
+          </form>
+        </div>
       </div>
-
-      <!-- Suggestion Chips -->
-      <div class="px-4 py-2 bg-white border-t border-gray-100 flex gap-2 overflow-x-auto text-xs">
-        <button onclick="sendQuickQuery('How do I apply for Ration Card?')" class="px-3 py-1.5 rounded-full bg-surface-container border border-outline-variant text-primary font-medium shrink-0 hover:bg-primary hover:text-white transition-colors">Ration Card Docs?</button>
-        <button onclick="sendQuickQuery('What is the status of PM-Kisan?')" class="px-3 py-1.5 rounded-full bg-surface-container border border-outline-variant text-primary font-medium shrink-0 hover:bg-primary hover:text-white transition-colors">PM-Kisan Update</button>
-        <button onclick="sendQuickQuery('How do I report broken street light?')" class="px-3 py-1.5 rounded-full bg-surface-container border border-outline-variant text-primary font-medium shrink-0 hover:bg-primary hover:text-white transition-colors">Report Broken Light</button>
-      </div>
-
-      <!-- Input Toolbar -->
-      <form id="chat-form" class="p-3 bg-white border-t border-outline-variant flex items-center gap-2">
-        <button type="button" id="mic-btn" class="w-12 h-12 rounded-full bg-secondary-container text-white flex items-center justify-center shadow-md hover:bg-secondary transition-all shrink-0" title="Tap to Speak">
-          <span class="material-symbols-outlined text-2xl">mic</span>
-        </button>
-
-        <input type="text" id="chat-input" placeholder="Type your question or speak in Hindi/English..." class="flex-1 h-12 px-4 rounded-full border border-outline-variant bg-surface-container-low text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary"/>
-
-        <button type="submit" class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center shadow-md hover:bg-primary-container transition-all shrink-0">
-          <span class="material-symbols-outlined text-2xl">send</span>
-        </button>
-      </form>
     </section>
 
     <!-- TAB 4: REPORT A PROBLEM FORM -->
@@ -379,29 +377,29 @@
 
   </main>
 
-  <!-- Bottom Navigation Bar (Mobile & Desktop Accessible) -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-outline-variant py-2 px-4 z-40 shadow-lg flex justify-around items-center max-w-4xl mx-auto rounded-t-2xl">
-    <button onclick="switchTab('tab-home')" id="nav-btn-home" class="nav-item flex flex-col items-center justify-center p-2 rounded-xl text-primary font-bold text-xs transition-transform active:scale-95">
+  <!-- Bottom Navigation Bar -->
+  <nav class="bottom-navbar">
+    <button onclick="switchTab('tab-home')" id="nav-btn-home" class="nav-btn active">
       <span class="material-symbols-outlined text-2xl">home</span>
       <span id="nav-lbl-home">Home</span>
     </button>
 
-    <button onclick="switchTab('tab-services')" id="nav-btn-services" class="nav-item flex flex-col items-center justify-center p-2 rounded-xl text-gray-500 text-xs transition-transform active:scale-95">
+    <button onclick="switchTab('tab-services')" id="nav-btn-services" class="nav-btn">
       <span class="material-symbols-outlined text-2xl">grid_view</span>
       <span id="nav-lbl-services">Services</span>
     </button>
 
-    <button onclick="switchTab('tab-chat')" id="nav-btn-chat" class="nav-item flex flex-col items-center justify-center p-2.5 rounded-full bg-secondary-container text-white shadow-md transition-transform active:scale-95 -mt-5">
+    <button onclick="switchTab('tab-chat')" id="nav-btn-chat" class="nav-btn-center" title="AI Voice Assistant">
       <span class="material-symbols-outlined text-2xl">chat_bubble</span>
       <span id="nav-lbl-chat" class="sr-only">AI Chat</span>
     </button>
 
-    <button onclick="switchTab('tab-report')" id="nav-btn-report" class="nav-item flex flex-col items-center justify-center p-2 rounded-xl text-gray-500 text-xs transition-transform active:scale-95">
+    <button onclick="switchTab('tab-report')" id="nav-btn-report" class="nav-btn">
       <span class="material-symbols-outlined text-2xl">report_problem</span>
       <span id="nav-lbl-report">Report</span>
     </button>
 
-    <button onclick="switchTab('tab-profile')" id="nav-btn-profile" class="nav-item flex flex-col items-center justify-center p-2 rounded-xl text-gray-500 text-xs transition-transform active:scale-95">
+    <button onclick="switchTab('tab-profile')" id="nav-btn-profile" class="nav-btn">
       <span class="material-symbols-outlined text-2xl">account_circle</span>
       <span id="nav-lbl-profile">Profile</span>
     </button>
@@ -422,17 +420,14 @@
         <p class="text-xs text-gray-500 mt-1">Access your citizen applications or admin portal</p>
       </div>
 
-      <!-- Quick Demo Login Buttons -->
-      <div class="mb-5 p-3 rounded-2xl bg-amber-50 border border-amber-200 text-xs">
-        <p class="font-bold text-amber-900 mb-2">⚡ 1-Click Quick Demo Login:</p>
-        <div class="flex gap-2">
-          <button id="quick-citizen-login" class="flex-1 py-2 px-3 rounded-xl bg-primary text-white font-bold text-xs shadow-sm hover:bg-primary-container transition-colors">
-            Login as Citizen (Rajesh)
-          </button>
-          <button id="quick-admin-login" class="flex-1 py-2 px-3 rounded-xl bg-secondary-container text-white font-bold text-xs shadow-sm hover:bg-secondary transition-colors">
-            Login as Admin (Officer Ramesh)
-          </button>
-        </div>
+      <!-- Quick Sign-In Buttons -->
+      <div class="mb-5 flex gap-2">
+        <button id="quick-citizen-login" class="flex-1 py-2.5 px-3 rounded-xl bg-primary text-white font-bold text-xs shadow-sm hover:bg-primary-container transition-colors">
+          Login as Citizen
+        </button>
+        <button id="quick-admin-login" class="flex-1 py-2.5 px-3 rounded-xl bg-secondary-container text-white font-bold text-xs shadow-sm hover:bg-secondary transition-colors">
+          Login as Admin
+        </button>
       </div>
 
       <!-- Standard Login Form -->

@@ -365,9 +365,9 @@ app.get('/api/citizens', requireAuth, requireAdmin, async (req, res) => {
 // 6. MULTI-LINGUAL NLP DIALOG & ASSISTANT CHAT API
 app.post('/api/chat', requireAuth, async (req, res) => {
   try {
-    const { text, language } = req.body;
+    const { text, language, session_id } = req.body;
     const citizenId = req.auth.user.id;
-    const replyObj = await processUserQuery(text, citizenId, dbAsync, language || req.auth.user.language || 'en');
+    const replyObj = await processUserQuery(text, citizenId, dbAsync, language || req.auth.user.language || 'en', session_id || citizenId);
     
     // Save chat messages to MongoDB history.
     const replyText = typeof replyObj === 'string' ? replyObj : replyObj.reply;
@@ -380,6 +380,31 @@ app.post('/api/chat', requireAuth, async (req, res) => {
   } catch (err) {
     console.error("Chat engine error:", err);
     res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 7. HIGH-CLARITY TEXT-TO-SPEECH (TTS) AUDIO STREAM API
+app.get('/api/tts', async (req, res) => {
+  try {
+    const { text, lang } = req.query;
+    if (!text) return res.status(400).send("Text parameter required");
+
+    const nluUrl = process.env.NLU_SERVICE_URL || 'http://localhost:8000';
+    const baseUrl = nluUrl.replace('/parse', '');
+    const targetUrl = `${baseUrl}/tts?text=${encodeURIComponent(text)}&lang=${encodeURIComponent(lang || 'hi')}`;
+
+    const response = await fetch(targetUrl);
+    if (!response.ok) throw new Error(`TTS service error (${response.status})`);
+
+    const arrayBuffer = await response.arrayBuffer();
+    res.set({
+      'Content-Type': 'audio/mpeg',
+      'Cache-Control': 'public, max-age=3600'
+    });
+    res.send(Buffer.from(arrayBuffer));
+  } catch (err) {
+    console.error("TTS Proxy error:", err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
