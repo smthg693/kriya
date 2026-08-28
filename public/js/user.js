@@ -256,18 +256,7 @@ function switchTab(tabId) {
 
 // Language Switcher Engine
 function setupLanguageSwitcher() {
-  const langBtn = document.getElementById('lang-toggle-btn');
-  if (langBtn) {
-    langBtn.addEventListener('click', () => {
-      if (currentLang === 'en') currentLang = 'hi';
-      else if (currentLang === 'hi') currentLang = 'mr';
-      else currentLang = 'en';
-      localStorage.setItem('gram_lang', currentLang);
-      updateLanguageUI();
-    });
-  }
-
-  document.querySelectorAll('.lang-option-btn').forEach(btn => {
+  document.querySelectorAll('.lang-option-chip').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const selectedLang = btn.dataset.lang;
@@ -284,19 +273,36 @@ function setupLanguageSwitcher() {
 
 function updateLanguageUI() {
   const dict = translations[currentLang] || translations.en;
-  document.getElementById('lang-label').textContent = dict.langBtn;
-  document.getElementById('header-subtitle').textContent = dict.headerSub;
-  document.getElementById('home-welcome-badge').textContent = dict.welcomeBadge;
-  document.getElementById('home-greeting').textContent = dict.greeting.replace('{name}', currentUser?.name || 'Citizen');
-  document.getElementById('home-subtext').textContent = dict.subtext;
-  document.getElementById('home-btn-voice').textContent = dict.btnVoice;
-  document.getElementById('home-btn-report').textContent = dict.btnReport;
-  document.getElementById('home-quick-actions-title').textContent = dict.quickActionsTitle;
+  const langLabel = document.getElementById('lang-label');
+  if (langLabel) langLabel.textContent = dict.langBtn;
 
-  document.getElementById('cat-land').textContent = dict.catLand;
-  document.getElementById('cat-pension').textContent = dict.catPension;
-  document.getElementById('cat-cert').textContent = dict.catCert;
-  document.getElementById('cat-complaint').textContent = dict.catComplaint;
+  document.querySelectorAll('.lang-option-chip').forEach(chip => {
+    chip.classList.toggle('active', chip.dataset.lang === currentLang);
+  });
+
+  const headerSub = document.getElementById('header-subtitle');
+  if (headerSub) headerSub.textContent = dict.headerSub;
+  const welcomeBadge = document.getElementById('home-welcome-badge');
+  if (welcomeBadge) welcomeBadge.textContent = dict.welcomeBadge;
+  const greeting = document.getElementById('home-greeting');
+  if (greeting) greeting.textContent = dict.greeting.replace('{name}', currentUser?.name || 'Citizen');
+  const subtext = document.getElementById('home-subtext');
+  if (subtext) subtext.textContent = dict.subtext;
+  const btnVoice = document.getElementById('home-btn-voice');
+  if (btnVoice) btnVoice.textContent = dict.btnVoice;
+  const btnReport = document.getElementById('home-btn-report');
+  if (btnReport) btnReport.textContent = dict.btnReport;
+  const quickTitle = document.getElementById('home-quick-actions-title');
+  if (quickTitle) quickTitle.textContent = dict.quickActionsTitle;
+
+  const catLand = document.getElementById('cat-land');
+  if (catLand) catLand.textContent = dict.catLand;
+  const catPension = document.getElementById('cat-pension');
+  if (catPension) catPension.textContent = dict.catPension;
+  const catCert = document.getElementById('cat-cert');
+  if (catCert) catCert.textContent = dict.catCert;
+  const catComplaint = document.getElementById('cat-complaint');
+  if (catComplaint) catComplaint.textContent = dict.catComplaint;
 
   document.getElementById('announcement-title-header').textContent = dict.annTitleHeader;
   document.getElementById('announcement-heading').textContent = dict.annHeading;
@@ -630,10 +636,10 @@ function appendChatMessage(sender, text, actions = []) {
     const safeText = escapeHTML(text);
     msgDiv.className = 'flex gap-3 max-w-[85%] self-end flex-row-reverse';
     msgDiv.innerHTML = `
-      <div class="w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+      <div class="user-avatar-badge">
         <span class="material-symbols-outlined text-sm">person</span>
       </div>
-      <div class="bg-emerald-800 text-white p-4 rounded-2xl rounded-tr-sm text-sm shadow-sm">
+      <div class="user-chat-bubble">
         <p>${safeText}</p>
       </div>
     `;
@@ -643,7 +649,7 @@ function appendChatMessage(sender, text, actions = []) {
     if (actions && actions.length > 0) {
       actionsHtml = `<div class="mt-3 pt-2 border-t border-slate-100 flex flex-wrap gap-2">` +
         actions.map(act => `
-          <button onclick="handleActionChip('${act.tab}', '${act.category || act.scheme || ''}')" class="px-3 py-1.5 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-800 hover:text-white transition-all shadow-sm">
+          <button onclick="handleActionChip('${act.tab}', '${act.category || act.scheme || ''}')" class="chat-action-btn">
             ${escapeHTML(act.label)} ➔
           </button>
         `).join('') + `</div>`;
@@ -651,19 +657,20 @@ function appendChatMessage(sender, text, actions = []) {
 
     msgDiv.className = 'flex gap-3 max-w-[85%]';
     const plainMsgText = text.replace(/<[^>]*>?/gm, '').replace(/[*#_]/g, '');
+    const listenLabel = currentLang === 'hi' ? 'सुनें' : (currentLang === 'mr' ? 'ऐका' : 'Listen');
     msgDiv.innerHTML = `
-      <div class="w-8 h-8 rounded-full bg-emerald-800 text-white flex items-center justify-center shrink-0 shadow-sm">
+      <div class="assistant-avatar-badge">
         <span class="material-symbols-outlined text-sm">support_agent</span>
       </div>
-      <div class="bg-white border border-slate-200 p-4 rounded-2xl rounded-tl-sm text-sm text-slate-800 shadow-sm relative group">
+      <div class="assistant-chat-bubble relative group">
         <div class="flex items-center justify-between gap-2 mb-1">
           <p class="font-semibold text-emerald-800 text-xs">Gram Sahayak</p>
-          <button onclick="speakText(this.getAttribute('data-text'))" data-text="${escapeHTML(plainMsgText)}" class="p-1 rounded-full hover:bg-slate-100 text-slate-500 hover:text-emerald-800 transition-colors inline-flex items-center gap-1 text-[11px]" title="Listen / सुनें">
+          <button onclick="speakText(this.getAttribute('data-text'))" data-text="${escapeHTML(plainMsgText)}" class="p-1 rounded-full hover:bg-slate-100 text-slate-500 hover:text-emerald-800 transition-colors inline-flex items-center gap-1 text-[11px]" title="Listen / ऐका / सुनें">
             <span class="material-symbols-outlined text-base">volume_up</span>
-            <span class="font-medium">${currentLang === 'hi' ? 'सुनें' : 'Listen'}</span>
+            <span class="font-medium">${listenLabel}</span>
           </button>
         </div>
-        <div class="leading-relaxed">${formattedText}</div>
+        <div class="leading-relaxed text-slate-900">${formattedText}</div>
         ${actionsHtml}
       </div>
     `;

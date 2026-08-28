@@ -36,28 +36,17 @@
     </div>
 
     <div class="flex items-center gap-3">
-      <!-- Language Switcher Rollout Hover Menu -->
-      <div class="relative group z-50">
-        <button id="lang-toggle-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-slate-200 text-xs font-bold text-slate-800 hover:bg-slate-100 transition-all shadow-sm cursor-pointer">
-          <span class="material-symbols-outlined text-[16px] text-emerald-800">translate</span>
+      <!-- Language Switcher Horizontal Rollout Bar -->
+      <div id="lang-rollout-bar" class="lang-rollout-bar" title="Hover to change language / भाषा बदलने के लिए माउस लाएं">
+        <div class="lang-rollout-header">
+          <span class="material-symbols-outlined text-[18px]">translate</span>
           <span id="lang-label">English</span>
-          <span class="material-symbols-outlined text-[14px] text-slate-400 group-hover:rotate-180 transition-transform">expand_more</span>
-        </button>
-
-        <!-- Rollout Menu Options -->
-        <div class="absolute right-0 mt-1.5 w-36 bg-white border border-slate-200 rounded-xl shadow-xl p-1.5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform -translate-y-2 group-hover:translate-y-0 flex flex-col gap-1 z-50">
-          <button data-lang="en" class="lang-option-btn flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors w-full text-left cursor-pointer">
-            <span>English</span>
-            <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded">EN</span>
-          </button>
-          <button data-lang="hi" class="lang-option-btn flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors w-full text-left cursor-pointer">
-            <span>हिंदी</span>
-            <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded">HI</span>
-          </button>
-          <button data-lang="mr" class="lang-option-btn flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors w-full text-left cursor-pointer">
-            <span>मराठी</span>
-            <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded">MR</span>
-          </button>
+          <span class="material-symbols-outlined text-[14px] chevron-icon">expand_more</span>
+        </div>
+        <div class="lang-rollout-options">
+          <button type="button" data-lang="en" class="lang-option-chip active">English</button>
+          <button type="button" data-lang="hi" class="lang-option-chip">हिंदी</button>
+          <button type="button" data-lang="mr" class="lang-option-chip">मराठी</button>
         </div>
       </div>
 
@@ -248,9 +237,9 @@
         <div class="chat-footer">
           <!-- Suggestion Chips -->
           <div class="px-4 py-2 bg-slate-50 border-b border-slate-200 flex gap-2 overflow-x-auto text-xs">
-            <button onclick="sendQuickQuery('How do I apply for Ration Card?')" class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-emerald-800 font-bold shrink-0 hover:bg-emerald-800 hover:text-white transition-colors shadow-sm">Ration Card Docs?</button>
-            <button onclick="sendQuickQuery('What is the status of PM-Kisan?')" class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-emerald-800 font-bold shrink-0 hover:bg-emerald-800 hover:text-white transition-colors shadow-sm">PM-Kisan Update</button>
-            <button onclick="sendQuickQuery('How do I report broken street light?')" class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-emerald-800 font-bold shrink-0 hover:bg-emerald-800 hover:text-white transition-colors shadow-sm">Report Broken Light</button>
+            <button onclick="sendQuickQuery('How do I apply for Ration Card?')" class="suggestion-chip">Ration Card Docs?</button>
+            <button onclick="sendQuickQuery('What is the status of PM-Kisan?')" class="suggestion-chip">PM-Kisan Update</button>
+            <button onclick="sendQuickQuery('How do I report broken street light?')" class="suggestion-chip">Report Broken Light</button>
           </div>
 
           <!-- Input Toolbar -->
