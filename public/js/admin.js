@@ -348,7 +348,9 @@ function renderCitizensGrid() {
   const grid = document.getElementById('citizens-cards-grid');
   grid.innerHTML = citizensData.map(c => `
     <div class="bg-gray-50 border border-outline-variant p-4 rounded-2xl flex items-center gap-3">
-      <img src="${escapeHTML(c.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(c.name || 'Citizen'))}" alt="${escapeHTML(c.name || 'Citizen')}" class="w-12 h-12 rounded-full object-cover shrink-0 border border-primary/20"/>
+      <div class="w-10 h-10 rounded-full bg-emerald-800 text-white flex items-center justify-center shrink-0 border border-primary/20">
+        <span class="material-symbols-outlined text-[24px]">person</span>
+      </div>
       <div>
         <h4 class="font-bold text-sm text-gray-900">${escapeHTML(c.name || c.username || 'Unnamed Citizen')}</h4>
         <p class="text-xs text-gray-500">ID: ${escapeHTML(c.id)} • ${escapeHTML(c.mobile || c.email || c.username || 'No contact details')}</p>

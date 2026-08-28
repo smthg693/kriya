@@ -440,7 +440,8 @@ function updateUserProfileDisplay() {
   }
   document.getElementById('user-name-display').textContent = currentUser.name;
   if (currentUser.avatar_url) {
-    document.getElementById('user-avatar-img').src = currentUser.avatar_url;
+    const headerAvatar = document.getElementById('user-avatar-img');
+    if (headerAvatar) headerAvatar.src = currentUser.avatar_url;
     const cardAvatar = document.getElementById('profile-card-avatar');
     if (cardAvatar) cardAvatar.src = currentUser.avatar_url;
   }
