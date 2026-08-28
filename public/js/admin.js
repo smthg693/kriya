@@ -255,12 +255,32 @@ function renderReportsTable() {
         }">${escapeHTML(rep.status)}</span>
       </td>
       <td class="py-3 px-4 text-right">
-        <button onclick="openStatusModal('${rep.id}', '${rep.category}', '${rep.location}', '${rep.status}', '${escapeHTML(rep.admin_notes || '')}')" class="px-3 py-1 bg-primary text-white font-semibold text-xs rounded-lg hover:bg-primary-container transition-all">
+        <button
+          data-action="manage-report"
+          data-id="${escapeHTML(rep.id)}"
+          data-category="${escapeHTML(rep.category)}"
+          data-location="${escapeHTML(rep.location)}"
+          data-status="${escapeHTML(rep.status)}"
+          data-notes="${escapeHTML(rep.admin_notes || '')}"
+          class="px-3 py-1 bg-primary text-white font-semibold text-xs rounded-lg hover:bg-primary-container transition-all">
           Manage
         </button>
       </td>
     </tr>
   `).join('');
+
+  // Attach event listeners via delegation (avoids inline onclick XSS)
+  tbody.querySelectorAll('[data-action="manage-report"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      openStatusModal(
+        btn.dataset.id,
+        btn.dataset.category,
+        btn.dataset.location,
+        btn.dataset.status,
+        btn.dataset.notes
+      );
+    });
+  });
 }
 
 function setupFilterListeners() {
@@ -297,19 +317,26 @@ function renderApplicationsTable() {
       <td class="py-3 px-4 whitespace-nowrap">
         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold whitespace-nowrap bg-primary/10 text-primary">${escapeHTML(app.status)}</span>
       </td>
-      <td class="py-3 px-4 text-xs font-semibold text-gray-700 whitespace-nowrap">${app.progress_pct}%</td>
+      <td class="py-3 px-4 text-xs font-semibold text-gray-700 whitespace-nowrap">${parseInt(app.progress_pct, 10) || 0}%</td>
       <td class="py-3 px-4 text-right whitespace-nowrap">
         <div class="flex justify-end gap-2">
-        <button onclick="updateAppProgress('${app.id}', 'In Progress', 50)" class="px-2.5 py-1 bg-amber-500 text-white font-semibold text-xs rounded-lg hover:bg-amber-600 transition-all">
+        <button data-action="app-progress" data-id="${escapeHTML(app.id)}" data-status="In Progress" data-pct="50" class="px-2.5 py-1 bg-amber-500 text-white font-semibold text-xs rounded-lg hover:bg-amber-600 transition-all">
           Verify 50%
         </button>
-        <button onclick="updateAppProgress('${app.id}', 'Approved', 100)" class="px-2.5 py-1 bg-emerald-600 text-white font-semibold text-xs rounded-lg hover:bg-emerald-700 transition-all">
+        <button data-action="app-progress" data-id="${escapeHTML(app.id)}" data-status="Approved" data-pct="100" class="px-2.5 py-1 bg-emerald-600 text-white font-semibold text-xs rounded-lg hover:bg-emerald-700 transition-all">
           Approve 100%
         </button>
         </div>
       </td>
     </tr>
   `).join('');
+
+  // Attach event delegation for app progress buttons
+  tbody.querySelectorAll('[data-action="app-progress"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      updateAppProgress(btn.dataset.id, btn.dataset.status, parseInt(btn.dataset.pct, 10));
+    });
+  });
 }
 
 async function updateAppProgress(id, status, progressPct) {

@@ -19,10 +19,20 @@ const io = new Server(server, {
 
 const PORT = process.env.PORT || 3000;
 
+// ── Security Headers Middleware ──────────────────────────────────────────────
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  next();
+});
+
 // Middleware
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || false }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
 // Ensure uploads folder exists
 const uploadsDir = path.join(__dirname, 'public', 'uploads');
@@ -53,11 +63,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 // WebSockets Setup
 io.on('connection', (socket) => {
   const user = socket.data.user;
-  console.log('Client connected to WebSockets:', socket.id);
+  // Guard: user must be set by the auth middleware before joining rooms
+  if (!user) return;
   socket.join(user.role === 'admin' ? 'admins' : `citizen:${user.id}`);
 
   socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
+    // socket cleanup handled by Socket.IO internally
   });
 });
 
@@ -384,14 +395,20 @@ app.post('/api/chat', requireAuth, async (req, res) => {
 });
 
 // 7. HIGH-CLARITY TEXT-TO-SPEECH (TTS) AUDIO STREAM API
+const ALLOWED_TTS_LANGS = new Set(['en', 'hi', 'mr']);
 app.get('/api/tts', async (req, res) => {
   try {
-    const { text, lang } = req.query;
-    if (!text) return res.status(400).send("Text parameter required");
+    let { text, lang } = req.query;
+    if (!text || typeof text !== 'string') return res.status(400).send('Text parameter required');
+    // Sanitize: cap length to prevent DoS/SSRF amplification
+    text = text.trim().slice(0, 500);
+    if (!text) return res.status(400).send('Text parameter required');
+    // Allowlist languages
+    lang = ALLOWED_TTS_LANGS.has(lang) ? lang : 'hi';
 
     const nluUrl = process.env.NLU_SERVICE_URL || 'http://localhost:8000';
     const baseUrl = nluUrl.replace('/parse', '');
-    const targetUrl = `${baseUrl}/tts?text=${encodeURIComponent(text)}&lang=${encodeURIComponent(lang || 'hi')}`;
+    const targetUrl = `${baseUrl}/tts?text=${encodeURIComponent(text)}&lang=${encodeURIComponent(lang)}`;
 
     const response = await fetch(targetUrl);
     if (!response.ok) throw new Error(`TTS service error (${response.status})`);
@@ -403,8 +420,8 @@ app.get('/api/tts', async (req, res) => {
     });
     res.send(Buffer.from(arrayBuffer));
   } catch (err) {
-    console.error("TTS Proxy error:", err.message);
-    res.status(500).json({ error: err.message });
+    console.error('TTS Proxy error:', err.message);
+    res.status(500).json({ error: 'TTS service temporarily unavailable' });
   }
 });
 
@@ -420,5 +437,7 @@ initDatabase()
     });
   })
   .catch(err => {
-    console.error("Failed to initialize database:", err);
+    console.error('Failed to initialize database:', err.message);
+    process.exit(1);
   });
+

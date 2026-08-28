@@ -82,8 +82,12 @@ async function initDatabase(retries = 5, delay = 3000) {
 }
 
 async function seedInitialData() {
-  const citizenPassword = await bcrypt.hash('user123', 12);
-  const adminPassword = await bcrypt.hash('admin123', 12);
+  // Use env-configured passwords so plaintext never lives in source code.
+  // Defaults are intentionally obvious – operators MUST set these in .env.
+  const citizenPw = process.env.SEED_CITIZEN_PASSWORD || 'GramUser@2025!';
+  const adminPw   = process.env.SEED_ADMIN_PASSWORD   || 'GramAdmin@2025!';
+  const citizenPassword = await bcrypt.hash(citizenPw, 12);
+  const adminPassword   = await bcrypt.hash(adminPw, 12);
   const citizenDefaults = [
     { id: 'CIT-001', name: 'Rajesh Kumar', mobile: '9876543210', village: 'Kalyanpur', language: 'en' },
     { id: 'CIT-002', name: 'Sunita Devi', mobile: '9876543211', village: 'Kalyanpur', language: 'hi' }
