@@ -355,7 +355,7 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <button id="open-edit-profile-btn" class="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-800 hover:bg-emerald-800 hover:text-white font-bold text-xs border border-emerald-200 transition-all flex items-center gap-1.5 shadow-sm cursor-pointer">
+          <button id="open-edit-profile-btn" class="px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 shadow-sm cursor-pointer">
             <span class="material-symbols-outlined text-base">edit</span>
             <span>Edit Profile</span>
           </button>
@@ -483,7 +483,7 @@
       </button>
 
       <div class="text-center mb-5">
-        <div class="w-12 h-12 rounded-full bg-emerald-800 text-white flex items-center justify-center mx-auto mb-2 shadow-md">
+        <div id="edit-profile-modal-icon" class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2 shadow-md">
           <span class="material-symbols-outlined text-2xl">manage_accounts</span>
         </div>
         <h3 class="font-headline text-xl font-bold text-gray-900">Edit Profile Details</h3>
@@ -515,7 +515,7 @@
           <button type="button" id="cancel-edit-profile-btn" class="flex-1 py-2.5 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-all text-xs cursor-pointer">
             Cancel
           </button>
-          <button type="submit" class="flex-1 py-2.5 bg-emerald-800 text-white font-bold rounded-xl shadow-md hover:bg-emerald-900 transition-all text-xs cursor-pointer">
+          <button type="submit" id="save-edit-profile-btn" class="flex-1 py-2.5 font-bold rounded-xl shadow-md transition-all text-xs cursor-pointer">
             Save Changes
           </button>
         </div>

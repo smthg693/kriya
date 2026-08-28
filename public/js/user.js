@@ -852,8 +852,8 @@ async function loadCitizenData() {
               ${r.admin_notes ? `<p class="text-xs text-tertiary mt-1 font-medium">Secretary Note: ${escapeHTML(r.admin_notes)}</p>` : ''}
             </div>
             <span class="px-2.5 py-1 rounded-full text-xs font-bold ${
-              r.status === 'Resolved' ? 'bg-green-100 text-green-800' :
-              r.status === 'In Progress' ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-800'
+              r.status === 'Resolved' ? 'badge-resolved' :
+              r.status === 'In Progress' ? 'badge-in-progress' : 'badge-pending'
             }">${escapeHTML(r.status)}</span>
           </div>
         `).join('');

@@ -613,3 +613,72 @@ h1, h2, h3, h4, .font-headline {
   color: #ffffff !important;
   border-color: #064e3b !important;
 }
+
+/* ==================== HIGH-CONTRAST VISIBILITY OVERRIDES ==================== */
+#open-edit-profile-btn {
+  background-color: #ecfdf5 !important;
+  color: #064e3b !important;
+  border: 1.5px solid #a7f3d0 !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+#open-edit-profile-btn:hover {
+  background-color: #064e3b !important;
+  color: #ffffff !important;
+  border-color: #064e3b !important;
+}
+
+#edit-profile-modal-icon {
+  background-color: #064e3b !important;
+  color: #ffffff !important;
+}
+
+#save-edit-profile-btn,
+button[type="submit"].btn-emerald-primary {
+  background-color: #064e3b !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+#save-edit-profile-btn:hover,
+button[type="submit"].btn-emerald-primary:hover {
+  background-color: #022c22 !important;
+  color: #ffffff !important;
+}
+
+.badge-resolved {
+  background-color: #d1fae5 !important;
+  color: #065f46 !important;
+  border: 1px solid #a7f3d0 !important;
+  font-weight: 700 !important;
+}
+
+.badge-in-progress {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+  border: 1px solid #fde68a !important;
+  font-weight: 700 !important;
+}
+
+.badge-pending {
+  background-color: #f3f4f6 !important;
+  color: #374151 !important;
+  border: 1px solid #e5e7eb !important;
+  font-weight: 700 !important;
+}
+
+#edit-profile-form input {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  font-weight: 600 !important;
+}
+
+#edit-profile-form input:focus {
+  border-color: #064e3b !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(6, 78, 59, 0.15) !important;
+}
