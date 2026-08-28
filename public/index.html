@@ -51,10 +51,8 @@
       </div>
 
       <!-- User Profile / Login Avatar Button -->
-      <button id="auth-profile-btn" class="flex items-center gap-2 p-1 pr-3 rounded-full border border-slate-200 hover:bg-slate-100 transition-all bg-white shadow-sm">
-        <div class="w-8 h-8 rounded-full bg-emerald-800 text-white flex items-center justify-center shrink-0 shadow-sm">
-          <span class="material-symbols-outlined text-[20px]">person</span>
-        </div>
+      <button id="auth-profile-btn" class="flex items-center gap-2 p-1 pr-3 rounded-full border border-slate-200 hover:bg-slate-100 transition-all bg-white shadow-sm cursor-pointer">
+        <div id="header-user-avatar-container"></div>
         <span id="user-name-display" class="hidden md:inline text-xs font-bold text-slate-700">Sign in</span>
       </button>
     </div>
@@ -336,9 +334,7 @@
     <section id="tab-profile" class="tab-content hidden flex flex-col gap-6">
       <!-- Profile Header Bento Card -->
       <div class="bg-white rounded-2xl border border-outline-variant p-6 shadow-sm flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
-        <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-emerald-800/20 shadow-md shrink-0 bg-emerald-800 text-white flex items-center justify-center">
-          <span class="material-symbols-outlined text-[64px]">account_circle</span>
-        </div>
+        <div id="profile-card-avatar-container" class="shrink-0"></div>
 
         <div class="flex-1 text-center md:text-left">
           <h2 class="font-headline text-2xl font-bold text-gray-900" id="profile-card-name">Rajesh Kumar</h2>
@@ -483,9 +479,7 @@
       </button>
 
       <div class="text-center mb-5">
-        <div id="edit-profile-modal-icon" class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2 shadow-md">
-          <span class="material-symbols-outlined text-2xl">manage_accounts</span>
-        </div>
+        <div id="edit-profile-modal-icon" class="flex justify-center mx-auto mb-2"></div>
         <h3 class="font-headline text-xl font-bold text-gray-900">Edit Profile Details</h3>
         <p class="text-xs text-gray-500 mt-1">Update your display name, email ID, and mobile number.</p>
       </div>

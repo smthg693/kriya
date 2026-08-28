@@ -453,6 +453,44 @@ function setupAuthModal() {
   updateUserProfileDisplay();
 }
 
+function getInitialAvatarHtml(name, sizeClasses = 'w-16 h-16 text-xl') {
+  if (!name || typeof name !== 'string') name = 'Citizen';
+  const cleanName = name.trim();
+  const parts = cleanName.split(/\s+/);
+  let initials = '';
+  if (parts.length >= 2) {
+    initials = (parts[0][0] + parts[1][0]).toUpperCase();
+  } else if (parts.length === 1 && parts[0].length > 0) {
+    initials = parts[0].substring(0, Math.min(2, parts[0].length)).toUpperCase();
+  } else {
+    initials = 'C';
+  }
+
+  // WhatsApp-style rich color palette
+  const colors = [
+    { bg: '#064e3b', text: '#ffffff' }, // Deep Emerald
+    { bg: '#0369a1', text: '#ffffff' }, // Ocean Teal
+    { bg: '#6b21a8', text: '#ffffff' }, // Rich Purple
+    { bg: '#c2410c', text: '#ffffff' }, // Burnt Amber
+    { bg: '#0f766e', text: '#ffffff' }, // Deep Mint
+    { bg: '#b91c1c', text: '#ffffff' }, // Crimson Red
+    { bg: '#4d7c0f', text: '#ffffff' }, // Forest Green
+    { bg: '#1d4ed8', text: '#ffffff' }, // Cobalt Blue
+  ];
+
+  let hash = 0;
+  for (let i = 0; i < cleanName.length; i++) {
+    hash = cleanName.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const chosenColor = colors[Math.abs(hash) % colors.length];
+
+  return `
+    <div class="${sizeClasses} rounded-full flex items-center justify-center font-bold tracking-wider shrink-0 shadow-md select-none border-2 border-white/40" style="background-color: ${chosenColor.bg}; color: ${chosenColor.text}; font-family: 'Plus Jakarta Sans', sans-serif;">
+      <span>${initials}</span>
+    </div>
+  `;
+}
+
 function updateUserProfileDisplay() {
   if (!currentUser) {
     currentUser = {
@@ -474,14 +512,30 @@ function updateUserProfileDisplay() {
   const nameDisp = document.getElementById('user-name-display');
   if (nameDisp) nameDisp.textContent = currentToken ? (currentUser.name || currentUser.username || 'Citizen') : (currentUser.name || 'Sign in');
 
+  const headerAvatarContainer = document.getElementById('header-user-avatar-container');
+  if (headerAvatarContainer) {
+    headerAvatarContainer.innerHTML = getInitialAvatarHtml(currentUser.name || 'Citizen', 'w-8 h-8 text-xs');
+  }
+
   const cardName = document.getElementById('profile-card-name');
   if (cardName) cardName.textContent = currentUser.name || currentUser.username || 'Rajesh Kumar';
+
+  const cardAvatarContainer = document.getElementById('profile-card-avatar-container');
+  if (cardAvatarContainer) {
+    cardAvatarContainer.innerHTML = getInitialAvatarHtml(currentUser.name || 'Rajesh Kumar', 'w-20 h-20 text-2xl');
+  }
 
   const cardVillage = document.getElementById('profile-card-village');
   if (cardVillage) {
     const mob = (currentUser.mobile && currentUser.mobile !== 'null') ? currentUser.mobile : '9876543210';
     cardVillage.textContent = `${currentUser.village || 'Kalyanpur'} Village • Mobile: ${mob}`;
   }
+
+  const modalIcon = document.getElementById('edit-profile-modal-icon');
+  if (modalIcon) {
+    modalIcon.innerHTML = getInitialAvatarHtml(currentUser.name || 'Rajesh Kumar', 'w-12 h-12 text-sm');
+  }
+
   updateLanguageUI();
 }
 
@@ -656,11 +710,10 @@ function appendChatMessage(sender, text, actions = []) {
 
   if (sender === 'user') {
     const safeText = escapeHTML(text);
+    const avatarHtml = getInitialAvatarHtml(currentUser?.name || 'Citizen', 'w-8 h-8 text-xs');
     msgDiv.className = 'flex gap-3 max-w-[85%] self-end flex-row-reverse';
     msgDiv.innerHTML = `
-      <div class="user-avatar-badge">
-        <span class="material-symbols-outlined text-sm">person</span>
-      </div>
+      ${avatarHtml}
       <div class="user-chat-bubble">
         <p>${safeText}</p>
       </div>

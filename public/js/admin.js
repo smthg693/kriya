@@ -344,13 +344,48 @@ async function loadCitizens() {
   }
 }
 
+function getInitialAvatarHtml(name, sizeClasses = 'w-10 h-10 text-sm') {
+  if (!name || typeof name !== 'string') name = 'Citizen User';
+  const cleanName = name.trim();
+  const parts = cleanName.split(/\s+/);
+  let initials = '';
+  if (parts.length >= 2) {
+    initials = (parts[0][0] + parts[1][0]).toUpperCase();
+  } else if (parts.length === 1 && parts[0].length > 0) {
+    initials = parts[0].substring(0, Math.min(2, parts[0].length)).toUpperCase();
+  } else {
+    initials = 'CU';
+  }
+
+  const colors = [
+    { bg: '#064e3b', text: '#ffffff' }, // Deep Emerald
+    { bg: '#0369a1', text: '#ffffff' }, // Ocean Teal
+    { bg: '#6b21a8', text: '#ffffff' }, // Rich Purple
+    { bg: '#c2410c', text: '#ffffff' }, // Burnt Amber
+    { bg: '#0f766e', text: '#ffffff' }, // Deep Mint
+    { bg: '#b91c1c', text: '#ffffff' }, // Crimson Red
+    { bg: '#4d7c0f', text: '#ffffff' }, // Forest Green
+    { bg: '#1d4ed8', text: '#ffffff' }, // Cobalt Blue
+  ];
+
+  let hash = 0;
+  for (let i = 0; i < cleanName.length; i++) {
+    hash = cleanName.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const chosenColor = colors[Math.abs(hash) % colors.length];
+
+  return `
+    <div class="${sizeClasses} rounded-full flex items-center justify-center font-bold tracking-wider shrink-0 shadow-md select-none border-2 border-white/40" style="background-color: ${chosenColor.bg}; color: ${chosenColor.text}; font-family: 'Plus Jakarta Sans', sans-serif;">
+      <span>${initials}</span>
+    </div>
+  `;
+}
+
 function renderCitizensGrid() {
   const grid = document.getElementById('citizens-cards-grid');
   grid.innerHTML = citizensData.map(c => `
     <div class="bg-gray-50 border border-outline-variant p-4 rounded-2xl flex items-center gap-3">
-      <div class="w-10 h-10 rounded-full bg-emerald-800 text-white flex items-center justify-center shrink-0 border border-primary/20">
-        <span class="material-symbols-outlined text-[24px]">person</span>
-      </div>
+      ${getInitialAvatarHtml(c.name || c.username || 'Citizen', 'w-11 h-11 text-sm')}
       <div>
         <h4 class="font-bold text-sm text-gray-900">${escapeHTML(c.name || c.username || 'Unnamed Citizen')}</h4>
         <p class="text-xs text-gray-500">ID: ${escapeHTML(c.id)} • ${escapeHTML(c.mobile || c.email || c.username || 'No contact details')}</p>
