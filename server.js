@@ -114,16 +114,32 @@ app.post('/api/auth/login', loginRateLimit, async (req, res) => {
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { username, email, name, mobile, village, password } = req.body;
-    if (!username && !email) return res.status(400).json({ success: false, error: 'Username or email is required' });
+    const finalUsername = (username || mobile || email || '').trim();
+    if (!finalUsername) return res.status(400).json({ success: false, error: 'Username, mobile, or email is required' });
     if (!passwordIsStrong(password)) return res.status(400).json({ success: false, error: 'Password must be at least 8 characters and include a letter and a number' });
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ success: false, error: 'Enter a valid email address' });
+    if (email && email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return res.status(400).json({ success: false, error: 'Enter a valid email address' });
 
     const newId = 'CIT-' + Date.now();
     const defaultAvatar = 'https://lh3.googleusercontent.com/aida-public/AB6AXuBPRc6GYVwSy_AKt35qAxkHsARWBl5vkCni8miFTxQR8qgHr2_JKmagVvtoyYpYeUXR33tu82w316-dtwxbBRrYb47oHQ2ZW--l_X2XL7RruFntCX-8Ly_gxGrZpHIn0Qhd8TvmLd6tk__mqLTCNrmGanbMBa6JUzvaQyEU1sKWj_nJT5Bt88ga-VgUhVIjAdAE7EQolO9zNeDp-yH6WtskdaUO-C9WE-TR55b5NZBd7VZuVE421Sj6-g';
 
     const passwordHash = await bcrypt.hash(password, 12);
-    const newUser = { id: newId, username: username || mobile, name: name || username || email, mobile, village: village || 'Kalyanpur', password_hash: passwordHash, aadhaar_verified: 1, avatar_url: defaultAvatar, role: 'user', language: 'en', preferences: {}, created_at: new Date() };
-    if (email) newUser.email = email;
+    const newUser = {
+      id: newId,
+      username: finalUsername,
+      name: (name || finalUsername).trim(),
+      village: (village || 'Kalyanpur').trim(),
+      password_hash: passwordHash,
+      aadhaar_verified: 1,
+      avatar_url: defaultAvatar,
+      role: 'user',
+      language: 'en',
+      preferences: {},
+      created_at: new Date()
+    };
+
+    if (mobile && mobile.trim()) newUser.mobile = mobile.trim();
+    if (email && email.trim()) newUser.email = email.trim();
+
     await dbAsync.insertUser(newUser);
 
     const user = await dbAsync.findUserById(newId);

@@ -8,6 +8,9 @@ let client;
 let database;
 
 function collection(name) {
+  if (!database) {
+    throw new Error('Database not initialized. Call initDatabase() first.');
+  }
   return database.collection(name);
 }
 
@@ -21,12 +24,12 @@ function withoutSecrets(user) {
 
 async function initDatabase(retries = 5, delay = 3000) {
   if (!mongoUri) {
-    throw new Error('MONGODB_URI is required. Add it to your environment before starting the server.');
+    throw new Error('MONGODB_URI is required. Add it to your .env file or environment before starting the server.');
   }
 
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      client = new MongoClient(mongoUri, { tls: true, serverSelectionTimeoutMS: 10000, retryWrites: true });
+      client = new MongoClient(mongoUri, { serverSelectionTimeoutMS: 10000, retryWrites: true });
       await client.connect();
       database = client.db(databaseName);
       console.log(`✅ Successfully connected to MongoDB database: ${databaseName} (Attempt ${attempt})`);
@@ -38,12 +41,33 @@ async function initDatabase(retries = 5, delay = 3000) {
     }
   }
 
+  // Drop old sparse indexes if they exist to upgrade to partial filter expressions
+  const oldIndexesToDrop = [
+    { coll: 'users', name: 'email_1' },
+    { coll: 'users', name: 'mobile_1' },
+    { coll: 'citizens', name: 'mobile_1' }
+  ];
+  for (const idx of oldIndexesToDrop) {
+    try {
+      await collection(idx.coll).dropIndex(idx.name);
+    } catch (e) {
+      // Ignore if index doesn't exist or already dropped
+    }
+  }
+
+  // Clean up any test documents from previous runs
+  try {
+    await collection('users').deleteMany({ id: { $regex: /^CIT-TEST-/ } });
+    await collection('citizens').deleteMany({ id: { $regex: /^CIT-TEST-/ } });
+  } catch (e) {}
+
+  // Create robust performance and uniqueness indexes with partial filter expressions
   await Promise.all([
     collection('users').createIndex({ username: 1 }, { unique: true }),
-    collection('users').createIndex({ email: 1 }, { unique: true, sparse: true }),
-    collection('users').createIndex({ mobile: 1 }, { unique: true, sparse: true }),
+    collection('users').createIndex({ email: 1 }, { unique: true, partialFilterExpression: { email: { $type: 'string' } } }),
+    collection('users').createIndex({ mobile: 1 }, { unique: true, partialFilterExpression: { mobile: { $type: 'string' } } }),
     collection('citizens').createIndex({ id: 1 }, { unique: true }),
-    collection('citizens').createIndex({ mobile: 1 }, { unique: true }),
+    collection('citizens').createIndex({ mobile: 1 }, { unique: true, partialFilterExpression: { mobile: { $type: 'string' } } }),
     collection('admins').createIndex({ username: 1 }, { unique: true }),
     collection('reports').createIndex({ citizen_id: 1, created_at: -1 }),
     collection('reports').createIndex({ id: 1 }, { unique: true }),
@@ -90,12 +114,13 @@ async function syncLegacyUsers() {
     ...admins.map(user => ({ ...user, username: user.username || (user.name || 'admin').toLowerCase().replace(/\s+/g, '.'), role: 'admin' }))
   ];
   for (const user of users) {
-    const { password, ...userWithoutPassword } = user;
+    const { password, _id, ...userWithoutPassword } = user;
     const update = { ...userWithoutPassword };
     if (!update.email) delete update.email;
+    if (!update.mobile) delete update.mobile;
     await collection('users').updateOne(
       { id: user.id },
-      { $set: update, $unset: { password: '', ...(user.email ? {} : { email: '' }) } },
+      { $set: update, $unset: { password: '', ...(user.email ? {} : { email: '' }), ...(user.mobile ? {} : { mobile: '' }) } },
       { upsert: true }
     );
   }
@@ -119,18 +144,44 @@ const dbAsync = {
     return withoutSecrets(user);
   },
   findUserById: async (id) => withoutSecrets(await collection('users').findOne({ $or: [{ id }, { _id: id }] })),
-  insertUser: (user) => collection('users').insertOne(user),
+  insertUser: async (user) => {
+    const cleanUser = { ...user };
+    if (!cleanUser.mobile || typeof cleanUser.mobile !== 'string' || !cleanUser.mobile.trim()) delete cleanUser.mobile;
+    if (!cleanUser.email || typeof cleanUser.email !== 'string' || !cleanUser.email.trim()) delete cleanUser.email;
+    await collection('users').insertOne(cleanUser);
+    
+    // Also sync to legacy citizens collection
+    const citizenDoc = { ...cleanUser };
+    delete citizenDoc._id;
+    await collection('citizens').updateOne({ id: cleanUser.id }, { $set: citizenDoc }, { upsert: true });
+    return cleanUser;
+  },
   updateUser: (id, update) => collection('users').updateOne({ _id: id }, update),
-  deleteUser: (id) => collection('users').deleteOne({ id }),
+  deleteUser: async (id) => {
+    await collection('users').deleteOne({ id });
+    await collection('citizens').deleteOne({ id });
+  },
   listUsers: () => collection('users').find({}, { projection: { password_hash: 0, password: 0 } }).sort({ created_at: -1 }).toArray(),
   findSession: (token) => collection('sessions').findOne({ token, expires_at: { $gt: new Date() } }),
   findOne: (name, filter) => collection(name).findOne(filter),
-  findMany: (name, filter = {}, options = {}) => collection(name).find(filter, options).toArray(),
+  findMany: (name, filter = {}, options = {}) => {
+    const { sort, limit, skip, projection } = options;
+    let cursor = collection(name).find(filter, { projection });
+    if (sort) cursor = cursor.sort(sort);
+    if (skip) cursor = cursor.skip(skip);
+    if (limit) cursor = cursor.limit(limit);
+    return cursor.toArray();
+  },
   insert: (name, document) => collection(name).insertOne(document),
   update: (name, filter, update) => collection(name).updateOne(filter, update),
   remove: (name, filter) => collection(name).deleteOne(filter),
   count: (name, filter = {}) => collection(name).countDocuments(filter),
-  saveChat: (document) => collection('chatHistory').insertMany([document.user, document.assistant]),
+  saveChat: (document) => {
+    const docs = Array.isArray(document)
+      ? document
+      : (document.user && document.assistant ? [document.user, document.assistant] : [document]);
+    return collection('chatHistory').insertMany(docs);
+  },
   close: () => client?.close()
 };
 

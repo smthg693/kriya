@@ -367,12 +367,16 @@ function setupAuthModal() {
     });
     signupForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      const mobileInput = document.getElementById('signup-mobile')?.value.trim();
+      const emailInput = document.getElementById('signup-email')?.value.trim();
       const body = {
         username: document.getElementById('signup-username').value.trim(),
-        email: document.getElementById('signup-email').value.trim() || undefined,
         name: document.getElementById('signup-name').value.trim(),
         password: document.getElementById('signup-password').value
       };
+      if (mobileInput) body.mobile = mobileInput;
+      if (emailInput) body.email = emailInput;
+
       try {
         const res = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
         const data = await res.json();
