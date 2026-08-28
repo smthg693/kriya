@@ -221,7 +221,7 @@
         <div id="chat-messages-container" class="chat-messages">
           <!-- Initial Assistant Greeting -->
           <div class="flex gap-3 max-w-[85%]">
-            <div class="w-8 h-8 rounded-full bg-emerald-800 text-white flex items-center justify-center shrink-0">
+            <div class="w-8 h-8 rounded-full bot-avatar-badge flex items-center justify-center shrink-0">
               <span class="material-symbols-outlined text-sm">support_agent</span>
             </div>
             <div class="bg-white border border-slate-200 p-4 rounded-2xl rounded-tl-sm text-sm text-slate-800 shadow-sm">
@@ -268,25 +268,25 @@
         <div>
           <label class="block text-sm font-bold text-gray-800 mb-2">1. Select Issue Category</label>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <label class="flex flex-col items-center p-3 rounded-xl border border-outline-variant bg-gray-50 cursor-pointer hover:bg-primary/5 transition-colors text-center">
+            <label class="issue-category-card flex flex-col items-center p-3 rounded-xl border border-outline-variant bg-gray-50 cursor-pointer text-center">
               <input type="radio" name="issue_category" value="Water Supply" checked class="mb-1 text-primary focus:ring-primary"/>
               <span class="material-symbols-outlined text-primary text-2xl">water_drop</span>
               <span class="text-xs font-semibold text-gray-800 mt-1">Water Supply</span>
             </label>
 
-            <label class="flex flex-col items-center p-3 rounded-xl border border-outline-variant bg-gray-50 cursor-pointer hover:bg-primary/5 transition-colors text-center">
+            <label class="issue-category-card flex flex-col items-center p-3 rounded-xl border border-outline-variant bg-gray-50 cursor-pointer text-center">
               <input type="radio" name="issue_category" value="Electricity" class="mb-1 text-primary focus:ring-primary"/>
               <span class="material-symbols-outlined text-secondary text-2xl">bolt</span>
               <span class="text-xs font-semibold text-gray-800 mt-1">Electricity</span>
             </label>
 
-            <label class="flex flex-col items-center p-3 rounded-xl border border-outline-variant bg-gray-50 cursor-pointer hover:bg-primary/5 transition-colors text-center">
+            <label class="issue-category-card flex flex-col items-center p-3 rounded-xl border border-outline-variant bg-gray-50 cursor-pointer text-center">
               <input type="radio" name="issue_category" value="Roads" class="mb-1 text-primary focus:ring-primary"/>
               <span class="material-symbols-outlined text-tertiary text-2xl">add_road</span>
               <span class="text-xs font-semibold text-gray-800 mt-1">Roads & Potholes</span>
             </label>
 
-            <label class="flex flex-col items-center p-3 rounded-xl border border-outline-variant bg-gray-50 cursor-pointer hover:bg-primary/5 transition-colors text-center">
+            <label class="issue-category-card flex flex-col items-center p-3 rounded-xl border border-outline-variant bg-gray-50 cursor-pointer text-center">
               <input type="radio" name="issue_category" value="Sanitation" class="mb-1 text-primary focus:ring-primary"/>
               <span class="material-symbols-outlined text-gray-600 text-2xl">cleaning_services</span>
               <span class="text-xs font-semibold text-gray-800 mt-1">Sanitation</span>
@@ -341,10 +341,10 @@
           <p class="text-sm text-gray-500" id="profile-card-village">Kalyanpur Village • Mobile: 9876543210</p>
           
           <div class="flex flex-wrap justify-center md:justify-start gap-2 mt-3">
-            <span class="px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-bold flex items-center gap-1">
+            <span class="px-3 py-1 rounded-full badge-aadhaar text-xs font-bold flex items-center gap-1">
               <span class="material-symbols-outlined text-xs">verified</span> Aadhaar Verified
             </span>
-            <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold flex items-center gap-1">
+            <span class="px-3 py-1 rounded-full badge-citizen-id text-xs font-bold flex items-center gap-1">
               <span class="material-symbols-outlined text-xs">badge</span> Citizen ID: CIT-001
             </span>
           </div>

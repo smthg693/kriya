@@ -682,3 +682,105 @@ button[type="submit"].btn-emerald-primary:hover {
   outline: none !important;
   box-shadow: 0 0 0 3px rgba(6, 78, 59, 0.15) !important;
 }
+
+/* ==================== COMPREHENSIVE ALL-SECTION THEME & VISIBILITY OVERRIDES ==================== */
+
+/* Primary & Outline Emerald Buttons */
+.btn-emerald-primary,
+button.btn-primary,
+.btn-apply-scheme {
+  background-color: #064e3b !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border: 1px solid #064e3b !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-emerald-primary:hover,
+button.btn-primary:hover,
+.btn-apply-scheme:hover {
+  background-color: #022c22 !important;
+  color: #ffffff !important;
+  border-color: #022c22 !important;
+}
+
+/* Category Selection Card Highlight in Report Issue */
+.issue-category-card {
+  transition: all 0.2s ease !important;
+}
+.issue-category-card:has(input:checked) {
+  border-color: #064e3b !important;
+  background-color: #ecfdf5 !important;
+  box-shadow: 0 2px 8px rgba(6, 78, 59, 0.15) !important;
+}
+
+/* Sign Out & Red Action Buttons */
+#logout-btn {
+  background-color: #fef2f2 !important;
+  color: #dc2626 !important;
+  border: 1.5px solid #fca5a5 !important;
+  font-weight: 700 !important;
+}
+#logout-btn:hover {
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
+  border-color: #dc2626 !important;
+}
+
+/* Auth Modal Quick Buttons */
+#quick-citizen-login {
+  background-color: #064e3b !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+#quick-citizen-login:hover {
+  background-color: #022c22 !important;
+}
+
+#quick-admin-login {
+  background-color: #ea580c !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+#quick-admin-login:hover {
+  background-color: #c2410c !important;
+}
+
+#login-form button[type="submit"],
+#signup-form button[type="submit"],
+#report-issue-form button[type="submit"],
+#update-status-form button[type="submit"] {
+  background-color: #064e3b !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 12px rgba(6, 78, 59, 0.25) !important;
+}
+
+#login-form button[type="submit"]:hover,
+#signup-form button[type="submit"]:hover,
+#report-issue-form button[type="submit"]:hover,
+#update-status-form button[type="submit"]:hover {
+  background-color: #022c22 !important;
+}
+
+/* Initial Assistant Greeting Avatar in Chat */
+.bot-avatar-badge {
+  background-color: #064e3b !important;
+  color: #ffffff !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Aadhaar & Citizen ID Badges */
+.badge-aadhaar {
+  background-color: #d1fae5 !important;
+  color: #065f46 !important;
+  border: 1px solid #a7f3d0 !important;
+  font-weight: 700 !important;
+}
+
+.badge-citizen-id {
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
+  border: 1px solid #bfdbfe !important;
+  font-weight: 700 !important;
+}
