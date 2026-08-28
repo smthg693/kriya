@@ -620,15 +620,27 @@ h1, h2, h3, h4, .font-headline {
   color: #064e3b !important;
   border: 1.5px solid #a7f3d0 !important;
   font-weight: 700 !important;
+  font-size: 0.825rem !important;
+  padding: 0.55rem 1rem !important;
+  border-radius: 0.75rem !important;
   display: inline-flex !important;
   align-items: center !important;
-  gap: 6px !important;
+  justify-content: center !important;
+  gap: 0.4rem !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
 }
 
 #open-edit-profile-btn:hover {
   background-color: #064e3b !important;
   color: #ffffff !important;
   border-color: #064e3b !important;
+}
+
+#open-edit-profile-btn .material-symbols-outlined {
+  font-size: 18px !important;
 }
 
 #edit-profile-modal-icon {
@@ -720,11 +732,27 @@ button.btn-primary:hover,
   color: #dc2626 !important;
   border: 1.5px solid #fca5a5 !important;
   font-weight: 700 !important;
+  font-size: 0.825rem !important;
+  padding: 0.55rem 1rem !important;
+  border-radius: 0.75rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.4rem !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
 }
+
 #logout-btn:hover {
   background-color: #dc2626 !important;
   color: #ffffff !important;
   border-color: #dc2626 !important;
+}
+
+#logout-btn .material-symbols-outlined {
+  font-size: 18px !important;
 }
 
 /* Auth Modal Quick Buttons */

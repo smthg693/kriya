@@ -453,7 +453,12 @@ function setupAuthModal() {
   updateUserProfileDisplay();
 }
 
-function getInitialAvatarHtml(name, sizeClasses = 'w-16 h-16 text-xl') {
+function formatDisplayName(name) {
+  if (!name) return 'Citizen';
+  return name.trim().split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+}
+
+function getInitialAvatarHtml(name, sizeInput = 40, fontInput = null) {
   if (!name || typeof name !== 'string') name = 'Citizen';
   const cleanName = name.trim();
   const parts = cleanName.split(/\s+/);
@@ -484,8 +489,23 @@ function getInitialAvatarHtml(name, sizeClasses = 'w-16 h-16 text-xl') {
   }
   const chosenColor = colors[Math.abs(hash) % colors.length];
 
+  let sizePx = 40;
+  let fontRem = 1;
+  let classList = '';
+
+  if (typeof sizeInput === 'number') {
+    sizePx = sizeInput;
+    fontRem = fontInput || (sizePx / 40);
+  } else if (typeof sizeInput === 'string' && sizeInput.startsWith('w-')) {
+    classList = sizeInput;
+    if (sizeInput.includes('w-20')) { sizePx = 72; fontRem = 1.4; }
+    else if (sizeInput.includes('w-12')) { sizePx = 48; fontRem = 1.1; }
+    else if (sizeInput.includes('w-8')) { sizePx = 34; fontRem = 0.85; }
+    else { sizePx = 40; fontRem = 1; }
+  }
+
   return `
-    <div class="${sizeClasses} rounded-full flex items-center justify-center font-bold tracking-wider shrink-0 shadow-md select-none border-2 border-white/40" style="background-color: ${chosenColor.bg}; color: ${chosenColor.text}; font-family: 'Plus Jakarta Sans', sans-serif;">
+    <div class="rounded-full flex items-center justify-center font-bold tracking-wider shrink-0 shadow-md select-none border-2 border-white/40 ${classList}" style="width: ${sizePx}px; height: ${sizePx}px; min-width: ${sizePx}px; min-height: ${sizePx}px; max-width: ${sizePx}px; max-height: ${sizePx}px; font-size: ${fontRem}rem; background-color: ${chosenColor.bg}; color: ${chosenColor.text}; font-family: 'Plus Jakarta Sans', sans-serif;">
       <span>${initials}</span>
     </div>
   `;
@@ -510,30 +530,30 @@ function updateUserProfileDisplay() {
     headerLogoutBtn.classList.toggle('flex', Boolean(currentToken));
   }
   const nameDisp = document.getElementById('user-name-display');
-  if (nameDisp) nameDisp.textContent = currentToken ? (currentUser.name || currentUser.username || 'Citizen') : (currentUser.name || 'Sign in');
+  if (nameDisp) nameDisp.textContent = currentToken ? formatDisplayName(currentUser.name || currentUser.username || 'Citizen') : formatDisplayName(currentUser.name || 'Sign in');
 
   const headerAvatarContainer = document.getElementById('header-user-avatar-container');
   if (headerAvatarContainer) {
-    headerAvatarContainer.innerHTML = getInitialAvatarHtml(currentUser.name || 'Citizen', 'w-8 h-8 text-xs');
+    headerAvatarContainer.innerHTML = getInitialAvatarHtml(currentUser.name || 'Citizen', 34, 0.85);
   }
 
   const cardName = document.getElementById('profile-card-name');
-  if (cardName) cardName.textContent = currentUser.name || currentUser.username || 'Rajesh Kumar';
+  if (cardName) cardName.textContent = formatDisplayName(currentUser.name || currentUser.username || 'Rajesh Kumar');
 
   const cardAvatarContainer = document.getElementById('profile-card-avatar-container');
   if (cardAvatarContainer) {
-    cardAvatarContainer.innerHTML = getInitialAvatarHtml(currentUser.name || 'Rajesh Kumar', 'w-20 h-20 text-2xl');
+    cardAvatarContainer.innerHTML = getInitialAvatarHtml(currentUser.name || 'Rajesh Kumar', 72, 1.4);
   }
 
   const cardVillage = document.getElementById('profile-card-village');
   if (cardVillage) {
     const mob = (currentUser.mobile && currentUser.mobile !== 'null') ? currentUser.mobile : '9876543210';
-    cardVillage.textContent = `${currentUser.village || 'Kalyanpur'} Village • Mobile: ${mob}`;
+    cardVillage.textContent = `${formatDisplayName(currentUser.village || 'Kalyanpur')} Village • Mobile: ${mob}`;
   }
 
   const modalIcon = document.getElementById('edit-profile-modal-icon');
   if (modalIcon) {
-    modalIcon.innerHTML = getInitialAvatarHtml(currentUser.name || 'Rajesh Kumar', 'w-12 h-12 text-sm');
+    modalIcon.innerHTML = getInitialAvatarHtml(currentUser.name || 'Rajesh Kumar', 48, 1.1);
   }
 
   updateLanguageUI();
