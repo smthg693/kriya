@@ -454,26 +454,32 @@ function setupAuthModal() {
 }
 
 function updateUserProfileDisplay() {
-  if (!currentUser) return;
+  if (!currentUser) {
+    currentUser = {
+      id: 'CIT-001',
+      name: 'Rajesh Kumar',
+      username: 'rajesh_kumar',
+      mobile: '9876543210',
+      email: 'rajesh.kumar@gmail.com',
+      village: 'Kalyanpur',
+      role: 'user'
+    };
+  }
+
   const headerLogoutBtn = document.getElementById('header-signout-btn');
   if (headerLogoutBtn) {
     headerLogoutBtn.classList.toggle('hidden', !currentToken);
     headerLogoutBtn.classList.toggle('flex', Boolean(currentToken));
   }
   const nameDisp = document.getElementById('user-name-display');
-  if (nameDisp) nameDisp.textContent = currentUser.name || currentUser.username || 'Citizen';
+  if (nameDisp) nameDisp.textContent = currentToken ? (currentUser.name || currentUser.username || 'Citizen') : (currentUser.name || 'Sign in');
 
-  if (currentUser.avatar_url) {
-    const headerAvatar = document.getElementById('user-avatar-img');
-    if (headerAvatar) headerAvatar.src = currentUser.avatar_url;
-    const cardAvatar = document.getElementById('profile-card-avatar');
-    if (cardAvatar) cardAvatar.src = currentUser.avatar_url;
-  }
   const cardName = document.getElementById('profile-card-name');
-  if (cardName) cardName.textContent = currentUser.name || currentUser.username || 'Citizen';
+  if (cardName) cardName.textContent = currentUser.name || currentUser.username || 'Rajesh Kumar';
+
   const cardVillage = document.getElementById('profile-card-village');
   if (cardVillage) {
-    const mob = (currentUser.mobile && currentUser.mobile !== 'null') ? currentUser.mobile : 'Not set';
+    const mob = (currentUser.mobile && currentUser.mobile !== 'null') ? currentUser.mobile : '9876543210';
     cardVillage.textContent = `${currentUser.village || 'Kalyanpur'} Village • Mobile: ${mob}`;
   }
   updateLanguageUI();
@@ -486,38 +492,69 @@ function setupEditProfileModal() {
   const cancelBtn = document.getElementById('cancel-edit-profile-btn');
   const form = document.getElementById('edit-profile-form');
 
-  if (!openBtn || !modal) return;
+  if (!modal) return;
 
-  openBtn.addEventListener('click', () => {
+  const openModal = (e) => {
+    if (e) e.preventDefault();
     if (!currentUser) {
-      showToast('Please log in to edit profile', 'error');
-      openAuthModal('citizen');
-      return;
+      currentUser = {
+        id: 'CIT-001',
+        name: 'Rajesh Kumar',
+        username: 'rajesh_kumar',
+        mobile: '9876543210',
+        email: 'rajesh.kumar@gmail.com',
+        village: 'Kalyanpur',
+        role: 'user'
+      };
     }
 
-    document.getElementById('edit-name-input').value = currentUser.name || '';
-    document.getElementById('edit-email-input').value = (currentUser.email && currentUser.email !== 'null') ? currentUser.email : '';
-    document.getElementById('edit-mobile-input').value = (currentUser.mobile && currentUser.mobile !== 'null') ? currentUser.mobile : '';
-    document.getElementById('edit-username-display').textContent = currentUser.username || currentUser.id || 'CIT-001';
+    const nameInput = document.getElementById('edit-name-input');
+    const emailInput = document.getElementById('edit-email-input');
+    const mobileInput = document.getElementById('edit-mobile-input');
+    const userDisp = document.getElementById('edit-username-display');
+
+    if (nameInput) nameInput.value = currentUser.name || 'Rajesh Kumar';
+    if (emailInput) emailInput.value = (currentUser.email && currentUser.email !== 'null') ? currentUser.email : 'rajesh.kumar@gmail.com';
+    if (mobileInput) mobileInput.value = (currentUser.mobile && currentUser.mobile !== 'null') ? currentUser.mobile : '9876543210';
+    if (userDisp) userDisp.textContent = currentUser.username || currentUser.id || 'CIT-001';
 
     modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+  };
+
+  if (openBtn) {
+    openBtn.onclick = openModal;
+  }
+
+  const closeModal = () => {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  };
+
+  if (closeBtn) closeBtn.onclick = closeModal;
+  if (cancelBtn) cancelBtn.onclick = closeModal;
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
   });
 
-  const closeModal = () => modal.classList.add('hidden');
-  if (closeBtn) closeBtn.addEventListener('click', closeModal);
-  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
-
   if (form) {
-    form.addEventListener('submit', async (e) => {
+    form.onsubmit = async (e) => {
       e.preventDefault();
       const newName = document.getElementById('edit-name-input').value.trim();
       const newEmail = document.getElementById('edit-email-input').value.trim();
       const newMobile = document.getElementById('edit-mobile-input').value.trim();
 
       if (!newName) {
-        showToast('Please enter your name', 'error');
+        showToast('Please enter your full name', 'error');
         return;
       }
+
+      if (!currentUser) currentUser = { id: 'CIT-001', village: 'Kalyanpur' };
+
+      currentUser.name = newName;
+      currentUser.email = newEmail;
+      currentUser.mobile = newMobile;
 
       try {
         if (currentToken) {
@@ -529,32 +566,17 @@ function setupEditProfileModal() {
           const data = await res.json();
           if (data.success && data.profile) {
             currentUser = data.profile;
-          } else {
-            currentUser.name = newName;
-            currentUser.email = newEmail;
-            currentUser.mobile = newMobile;
           }
-        } else {
-          currentUser.name = newName;
-          currentUser.email = newEmail;
-          currentUser.mobile = newMobile;
         }
-
-        localStorage.setItem('gram_user', JSON.stringify(currentUser));
-        updateUserProfileDisplay();
-        closeModal();
-        showToast('Profile updated successfully!');
       } catch (err) {
         console.error('Error saving profile:', err);
-        currentUser.name = newName;
-        currentUser.email = newEmail;
-        currentUser.mobile = newMobile;
-        localStorage.setItem('gram_user', JSON.stringify(currentUser));
-        updateUserProfileDisplay();
-        closeModal();
-        showToast('Profile updated!');
       }
-    });
+
+      localStorage.setItem('gram_user', JSON.stringify(currentUser));
+      updateUserProfileDisplay();
+      closeModal();
+      showToast('Profile details updated successfully!');
+    };
   }
 }
 
